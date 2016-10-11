@@ -7,9 +7,9 @@ categories: jekyll
 
 WIP
 
-{% highlight python %}
+``` python
 def helloWorld():
     print("Hi. We're S_Society. This is SharpBoy. Welcome.")
 
 helloWorld()
-{% endhighlight %}
+```
