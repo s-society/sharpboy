@@ -5,7 +5,6 @@ date:   2016-10-04 17:42:44 +0200
 categories: jekyll
 ---
 
-WIP
 
 ``` python
 def helloWorld():
