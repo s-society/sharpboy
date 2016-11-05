@@ -11,3 +11,4 @@ timezone: Europe/Paris
 
 # Build settings
 markdown: kramdown
+highlighter: rouge
