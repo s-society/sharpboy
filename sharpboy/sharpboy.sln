@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "sharpboy", "sharpboy\sharpboy.fsproj", "{74F96E1D-099D-4C24-803E-058B2E2058D9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{74F96E1D-099D-4C24-803E-058B2E2058D9}.Debug|x86.ActiveCfg = Debug|x86
+		{74F96E1D-099D-4C24-803E-058B2E2058D9}.Debug|x86.Build.0 = Debug|x86
+		{74F96E1D-099D-4C24-803E-058B2E2058D9}.Release|x86.ActiveCfg = Release|x86
+		{74F96E1D-099D-4C24-803E-058B2E2058D9}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+EndGlobal
