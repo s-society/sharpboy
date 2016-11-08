@@ -13,5 +13,5 @@ We've done this through a side project, the creation of a
 this project can be found here : [https://github.com/s-society/chip-8](https://github.com/s-society/chip-8)
 
 Our Chip 8 emulator is currently in a functionning state, you can try it
-yourself by cloning the repo and checking out the `test` branch.  
+yourself by cloning the repo ; the master branch should be working correctly.
 You'll need Visual Studio and the F# runtime installed to run it.
