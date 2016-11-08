@@ -1,21 +1,11 @@
 ﻿<Properties StartupItem="sharpboy/sharpboy.fsproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="sharpboy/sharpboy.fs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="sharpboy/Program.fs">
     <Files>
-      <File FileName="sharpboy/Program.fs" Line="8" Column="5" />
-      <File FileName="sharpboy/sharpboy.fs" Line="1" Column="1" />
+      <File FileName="sharpboy/Program.fs" Line="40" Column="51" />
+      <File FileName="sharpboy/sharpboy.fs" Line="1" Column="27" />
+      <File FileName="sharpboy/opcodes.fs" Line="3" Column="32" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="sharpboy" expanded="True">
-            <Node name="sharpboy" expanded="True">
-              <Node name="sharpboy.fs" selected="True" />
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
