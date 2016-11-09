@@ -7,4 +7,4 @@ This day marks the beginnning of a week of free time we have before the mid term
 we decided to allocate every afternoon of this week to the improvement of our 
 [chip-8](https://github.com/s-society/chip-8).
 
-Hopefully we'll make some good progress this week
+Hopefully we'll make some good progress.
