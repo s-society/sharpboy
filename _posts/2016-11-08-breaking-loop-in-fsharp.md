@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Breaking a loop in F#"
+excerpt_separator: <!--more-->
 ---
 
 During [our work](https://github.com/s-society/chip-8) on the Chip 8 emulator,
@@ -8,7 +9,7 @@ we encountered some difficulties while learning the F# language:
 
 One of these difficulties was that as a functional language, F# didn't allow the use of
 a `break` keyword during `while` loops.
-
+<!--more-->
 Something like this won't work:
 
 ```  fsharp
