@@ -15,9 +15,9 @@ Something like this won't work:
 ```  fsharp
 let loop =
   for i in [0..8] do
-      if i = 6 then
-        printfn "%d" i
-        break
+    if i = 6 then
+      printfn "%d" i
+      break
 ```
 
 Instead, you have to leave your imperative thinking behind and go functional, with recursive functions:
@@ -25,9 +25,10 @@ Instead, you have to leave your imperative thinking behind and go functional, wi
 ``` fsharp
 let rec loop_rec i =
   if i < 9 then
-    if i = 6 then
+    if i != 6 then
+      loop_rec (i + 1)
+    else
       printfn "%d" i
-    loop_rec (i + 1)
   ()
 
 let loop =
