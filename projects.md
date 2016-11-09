@@ -9,9 +9,13 @@ This is the F# GameBoy emulator. Its code can be found [here](https://github.com
 
 The emulator isn't finished or even working yet, this is still a work in progress.
 
+[Latest release](https://github.com/s-society/sharpboy/releases/latest)
+
 ### Chip 8 :
 
 We've started our journey on the path to emulation with the creation of this simpler
 Chip 8 emulator. The code can be found [here](https://github.com/s-society/chip-8).
 
 You can go ahead and test it, you just need Visual Studio and the Visual F# tools.
+
+[Latest release](https://github.com/s-society/chip-8/releases/latest)
