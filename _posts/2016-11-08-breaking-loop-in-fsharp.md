@@ -11,13 +11,13 @@ a `break` keyword during `while` loops.
 
 Something like this won't work:
 
-{% highlight fsharp %}
+```  fsharp
 let loop =
   for i in [0..8] do
       if i = 6 then
         printfn "%d" i
         break
-{% endhighlight %}
+```
 
 Instead, you have to leave your imperative thinking behind and go functional, with recursive functions:
 
