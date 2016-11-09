@@ -1,4 +1,3 @@
-﻿
 ﻿module sharpboy
            
 //Necessary modules
@@ -20,6 +19,11 @@ let mutable registers = Array.create 8 0uy
 //Two 16-bit registers, SP which points to the stack position and starts at $FFFE, and PC which points to the next instruction to be executed and starts at $100
 let mutable PC = 0x100us
 let mutable SP = 0xFFFEus
+
+//Needed lines to make the form work for our purpose
+type DoubleBufferForm() =
+    inherit Form()
+    do base.SetStyle(ControlStyles.AllPaintingInWmPaint ||| ControlStyles.UserPaint ||| ControlStyles.DoubleBuffer, true)
 
 //Double Buffer Form for the main window of the emulator
 let form = new DoubleBufferForm()
