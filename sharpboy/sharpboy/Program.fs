@@ -1,5 +1,4 @@
-
-﻿//Necessary modules
+//Necessary modules
 open System 
 open System.Windows.Forms
 open System.IO
@@ -37,13 +36,13 @@ let main argv =
 
     *)
 
-    sharpboy.form.ClientSize -< new System.Drawing.Size(160 * 16 , 144 * 16)
-    sharpboy.form.Load.Add(fun e -> sharpboy.form.BackColor <- Color.Black
-                           Async.Start(main_loop))
-    sharpboy.form.Text <- String.Format("{0} - SharpBoy Emulator", rom_name)
-    sharpboy.form.MaximizeBox <- false
-    sharpboy.form.FormBorderStyle <- FormBorderStyle.FixedSingle
-    Application.Run(sharpboy.form)
+//    sharpboy.form.ClientSize <- new System.Drawing.Size(160 * 16 , 144 * 16)
+//    sharpboy.form.Load.Add(fun e -> sharpboy.form.BackColor <- Color.Black
+//                           Async.Start(main_loop))
+//    sharpboy.form.Text <- String.Format("{0} - SharpBoy Emulator", rom_name)
+//    sharpboy.form.MaximizeBox <- false
+//    sharpboy.form.FormBorderStyle <- FormBorderStyle.FixedSingle
+//    Application.Run(sharpboy.form)
 
 
                  
