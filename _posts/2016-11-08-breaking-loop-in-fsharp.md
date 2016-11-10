@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Breaking a loop in F#"
+title: "Exiting a loop in F#"
 excerpt_separator: <!--more-->
 ---
 
