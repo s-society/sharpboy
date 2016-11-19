@@ -2,6 +2,7 @@
 layout: post
 title:  "Update on what's happening right now"
 date:   2016-11-05 16:15:44 +0200
+comments: true
 ---
 
 We're finishing the first phase of this project, which is to understand the

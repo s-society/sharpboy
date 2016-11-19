@@ -2,6 +2,7 @@
 layout: post
 title: "Exiting a loop in F#"
 excerpt_separator: <!--more-->
+comments: true
 ---
 
 During [our work](https://github.com/s-society/chip-8) on the Chip 8 emulator,

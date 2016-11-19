@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Work has begun!"
+comments: true
 ---
 
 We've started to work on a [Chip 8](https://en.wikipedia.org/wiki/CHIP-8) emulator.  

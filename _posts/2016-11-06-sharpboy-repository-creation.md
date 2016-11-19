@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "SharpBoy repository is online!"
+comments: true
 ---
 We've uploaded the structure of the SharpBoy to GitHub !
 
