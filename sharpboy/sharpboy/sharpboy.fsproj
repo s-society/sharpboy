@@ -50,8 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Sharpboy.fs" />
-    <Compile Include="Opcodes.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
   </ItemGroup>
