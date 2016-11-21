@@ -52,6 +52,10 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
+    <Compile Include="Cpu.fs" />
+    <Compile Include="Instruction.fs" />
+    <Compile Include="Mmu.fs" />
+    <Compile Include="Register.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
