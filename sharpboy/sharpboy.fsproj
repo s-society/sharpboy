@@ -49,11 +49,13 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Sharpboy.fs" />
-    <Compile Include="Opcodes.fs" />
-    <Compile Include="Program.fs" />
     <None Include="App.config" />
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Mmu.fs" />
+    <Compile Include="Register.fs" />
+    <Compile Include="Instruction.fs" />
+    <Compile Include="Cpu.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
