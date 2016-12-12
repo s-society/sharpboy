@@ -1,4 +1,12 @@
 ﻿module Register
 
-let mutable A, B, C, D, E, F, H, L, SP, PC = 0x01uy,0uy,0x13uy,0uy,0xD8uy,0xB0uy,0x01uy,0x4duy,0xFFFEus,0x0100us 
-
+let mutable A = 0x01uy
+let mutable B = 0uy
+let mutable C = 0x13uy
+let mutable D = 0uy
+let mutable E = 0xD8uy
+let mutable F = 0b10110000uy
+let mutable H = 0x01uy
+let mutable L = 0x4Duy
+let mutable SP = 0xFFFEus
+let mutable PC = 0x0100us
