@@ -1,0 +1,4 @@
+A file containing posible problem sources in our code:
+
+- Initial values for registers
+- Not adding a 0xFFFF+1 adress in the memory
