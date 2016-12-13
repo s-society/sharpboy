@@ -5,6 +5,9 @@ open Register
 open Instruction
 
 
+let decSP () = SP <- SP - 1us 
+let incSP () = SP <- SP + 1us 
+
 opcode.[0x00] <- (fun () -> 
 
 opcode.[0x01] <- (fun () -> 
