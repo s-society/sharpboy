@@ -1,6 +1,6 @@
 ﻿module Cpu
 
-open Mmu
+open Memory
 open Register
 open Instruction
 

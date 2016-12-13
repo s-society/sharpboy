@@ -51,7 +51,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Mmu.fs" />
+    <Compile Include="Memory.fs" />
     <Compile Include="Register.fs" />
     <Compile Include="Instruction.fs" />
     <Compile Include="Cpu.fs" />
