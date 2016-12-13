@@ -2,7 +2,7 @@
 
 Greetings and welcome to our repository: Sharpboy !
 
-We are s-society: alarsyo, ilnoumri, naganori and megastorm. We are all students in a French computer engineering school called EPITA and this is a first year school project.
+We are s-society: alarsyo, ilnoumri, naganori-san and megastorm. We are all students in a French computer engineering school called EPITA and this is a first year school project.
 
 The Sharpboy Project is a GameBoy emulator that we are writing in F\#.
 
