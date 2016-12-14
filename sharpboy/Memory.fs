@@ -2,7 +2,7 @@
 
 
 let memory = Array.create (0xFFFF+1)
-let temp = 0uy
+let mutable temp = 0uy
 
 
 // Keep track of different memory places
