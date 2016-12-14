@@ -807,7 +807,7 @@ opcode.[0xE6] <- (fun () -> )
 
 opcode.[0xE7] <- (fun () -> rst(0x20us); 8uy)
 
-opcode.[0xE8] <- (fun () -> )
+opcode.[0xE8] <- (fun () -> addSP();  PC <- PC + 2us; 4uy)
 
 opcode.[0xE9] <- (fun () -> )
 
