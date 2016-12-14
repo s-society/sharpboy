@@ -6,7 +6,9 @@ open Instruction
 
 let adcA (n:byte) = Memory.temp <- (if CF then 1uy else 0uy) ; NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy) + Memory.temp) > 0x0Fuy ; CF <- (int A + int n + int Memory.temp) > 0xFF ; A <- A + n + Memory.temp ; ZF <- A = 0uy
 let addA (n:byte) = NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy)) > 0x0Fuy ; CF <- (A + n) < A ; A <- A + n ; ZF <- A = 0uy
-let andA (n:byte) =  A <- A &&& n ; ZF <- (A = 0uy) ; NF <- false; HF <- true; CF <- false 
+let andA (n:byte) =  A <- A &&& n ; ZF <- (A = 0uy) ; NF <- false; HF <- true; CF <- false
+let orA (n:byte) = A <- A ||| n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF <- false 
+let xorA (n:byte) = A <- A ^^^ n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF <- false
 
 let decSP () = SP <- SP - 1us 
 let incSP () = SP <- SP + 1us 
@@ -347,37 +349,37 @@ opcode.[0xA6] <- (fun () -> andA(readAddress_2(H, L)); PC <- PC + 1us; 2uy)
 
 opcode.[0xA7] <- (fun () -> andA(A); PC <- PC + 1us; 1uy) 
 
-opcode.[0xA8] <- (fun () -> 
+opcode.[0xA8] <- (fun () -> xorA(B); PC <- PC + 1us; 1uy)
 
-opcode.[0xA9] <- (fun () -> 
+opcode.[0xA9] <- (fun () -> xorA(C); PC <- PC + 1us; 1uy)
 
-opcode.[0xAA] <- (fun () -> 
+opcode.[0xAA] <- (fun () -> xorA(D); PC <- PC + 1us; 1uy)
 
-opcode.[0xAB] <- (fun () -> 
+opcode.[0xAB] <- (fun () -> xorA(E); PC <- PC + 1us; 1uy)
 
-opcode.[0xAC] <- (fun () -> 
+opcode.[0xAC] <- (fun () -> xorA(H); PC <- PC + 1us; 1uy)
 
-opcode.[0xAD] <- (fun () -> 
+opcode.[0xAD] <- (fun () -> xorA(L); PC <- PC + 1us; 1uy)
 
-opcode.[0xAE] <- (fun () -> 
+opcode.[0xAE] <- (fun () -> xorA(readAddress_2(H, L)); PC <- PC + 1us; 2uy)
 
-opcode.[0xAF] <- (fun () -> 
+opcode.[0xAF] <- (fun () -> xorA(A); PC <- PC + 1us; 1uy)
 
-opcode.[0xB0] <- (fun () -> 
+opcode.[0xB0] <- (fun () -> orA(B); PC <- PC + 1us; 1uy) 
 
-opcode.[0xB1] <- (fun () -> 
+opcode.[0xB1] <- (fun () -> orA(C); PC <- PC + 1us; 1uy) 
 
-opcode.[0xB2] <- (fun () -> 
+opcode.[0xB2] <- (fun () -> orA(D); PC <- PC + 1us; 1uy) 
 
-opcode.[0xB3] <- (fun () -> 
+opcode.[0xB3] <- (fun () -> orA(E); PC <- PC + 1us; 1uy) 
 
-opcode.[0xB4] <- (fun () -> 
+opcode.[0xB4] <- (fun () -> orA(H); PC <- PC + 1us; 1uy) 
 
-opcode.[0xB5] <- (fun () -> 
+opcode.[0xB5] <- (fun () -> orA(L); PC <- PC + 1us; 1uy) 
 
-opcode.[0xB6] <- (fun () -> 
+opcode.[0xB6] <- (fun () -> orA(readAddress_2(H, L)); PC <- PC + 1us; 2uy) 
 
-opcode.[0xB7] <- (fun () -> 
+opcode.[0xB7] <- (fun () -> orA(A); PC <- PC + 1us; 1uy) 
 
 opcode.[0xB8] <- (fun () -> 
 
@@ -487,7 +489,7 @@ opcode.[0xEC] <- (fun () ->
 
 opcode.[0xED] <- (fun () -> 
 
-opcode.[0xEE] <- (fun () -> 
+opcode.[0xEE] <- (fun () -> xorA(readAddress(PC+1us)); PC <- PC + 2us; 2uy) 
 
 opcode.[0xEF] <- (fun () -> 
 
@@ -503,7 +505,7 @@ opcode.[0xF4] <- (fun () ->
 
 opcode.[0xF5] <- (fun () -> 
 
-opcode.[0xF6] <- (fun () -> 
+opcode.[0xF6] <- (fun () -> orA(readAddress(PC+1us)); PC <- PC + 2us; 2uy) 
 
 opcode.[0xF7] <- (fun () -> 
 
