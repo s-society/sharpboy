@@ -20,6 +20,10 @@ let inc (reg:byte byref) = reg <- reg + 1uy; ZF <- (reg = 0uy) ; NF <- false; HF
 let incSP () = SP <- SP + 1us 
 let jp () = PC <- readAddress16(PC + 1us)
 let jpHL () = PC <- uint16 H <<< 8 ||| uint16 L
+let pop (into:uint16 byref) = into <- ((uint16 memory.[int (SP+1us)] <<< 8) ||| uint16 memory.[int SP]) ; SP <- SP + 2us
+let pop_2 (msb:byte byref, lsb:byte byref) = msb <- memory.[int (SP+1us)] ; lsb <- memory.[int SP] ; SP <- SP + 2us  
+let popAF() = pop_2(&A,&F) ; ZF <- (F &&& (1uy <<< 7)) > 1uy ; NF <- (F &&& (1uy <<< 6)) > 1uy ; HF <- (F &&& (1uy <<< 5)) > 1uy ; CF <- (F &&& (1uy <<< 4)) > 1uy
+
 
 
 let rlc (reg:byte byref) = CF <- (if reg &&& 0b10000000uy > 1uy then true else false) ; reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
@@ -45,6 +49,7 @@ let setHL(b:int) = temp <- readAddress_2(H,L) ; set(b, &temp) ; writeAddress_2(H
 
 let opcode = Array.create 0x100 (fun () -> 0uy)
 let CBopcode = Array.create (0x100) (fun () -> 0uy)
+
 
 opcode.[0x00] <- (fun () -> PC <- PC + 1us; 1uy) //NOP
 
