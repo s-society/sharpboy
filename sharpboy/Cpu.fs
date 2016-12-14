@@ -14,6 +14,9 @@ let xorA (n:byte) = A <- A ^^^ n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; C
 let subA (n:byte) = NF <- true ; HF <- (A &&& 0x0Fuy) < (n &&& 0x0Fuy) ; CF <- A < n ; A <- A - n ; ZF <- A = 0uy
 let sbcA (n:byte) = temp <- (if CF then 1uy else 0uy) ; NF <- true ; HF <- (A &&& 0x0Fuy) < ((n &&& 0x0Fuy)+temp) ; CF <- A < (n + temp); A <- A - n - temp ; ZF <- A = 0uy
 let cp (n:byte) = ZF <- (A = n) ; NF <- true; HF <- (A &&& 0x0Fuy) < (n &&& 0x0Fuy); CF <- A < n;
+let dec16 (msb:byte byref, lsb:byte byref) = temp16 <- (uint16 msb <<< 8 ||| uint16 lsb) - 1us ; msb <- byte ((temp16 &&& 0xFF00us) >>> 8) ; lsb <- byte (temp16 &&& 0x00FFus)
+let decHL () = temp <- readAddress_2(H,L) ; dec(&temp) ; writeAddress_2(H,L,temp)
+
 let decSP () = SP <- SP - 1us 
 let inc (reg:byte byref) = reg <- reg + 1uy; ZF <- (reg = 0uy) ; NF <- false; HF <- (reg = 0xF0uy)
 let incSP () = SP <- SP + 1us 
