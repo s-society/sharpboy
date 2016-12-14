@@ -72,6 +72,7 @@ let res (b:int, reg:byte byref) = reg <- reg &&& ~~~(1uy <<< b)
 let resHL(b:int) = temp <- readAddress_2(H,L) ; res(b, &temp) ; writeAddress_2(H,L,temp)
 let set (b:int, reg:byte byref) = reg <- reg ||| (1uy <<< b)
 let setHL(b:int) = temp <- readAddress_2(H,L) ; set(b, &temp) ; writeAddress_2(H,L,temp)
+let inc16 (msb:byte byref, lsb:byte byref) = temp16 <- (uint16 msb <<< 8 ||| uint16 lsb) + 1us ; msb <- byte ((temp16 &&& 0xFF00us) >>> 8) ; lsb <- byte (temp16 &&& 0x00FFus)
 
 let opcode = Array.create (0x100) (fun () -> 0uy)
 let CBopcode = Array.create (0x100) (fun () -> 0uy)
@@ -83,7 +84,7 @@ opcode.[0x01] <- (fun () -> B <- readAddress(PC + 2us); C <- readAddress(PC + 1u
 
 opcode.[0x02] <- (fun () -> writeAddress_2(B, C, A); PC <- PC + 1us; 2uy)
 
-opcode.[0x03] <- (fun () -> )
+opcode.[0x03] <- (fun () -> inc16(&B,&C);  PC <- PC + 1us; 2uy)
 
 opcode.[0x04] <- (fun () -> )
 
@@ -115,7 +116,7 @@ opcode.[0x11] <- (fun () -> D <- readAddress(PC + 2us); E <- readAddress(PC + 1u
 
 opcode.[0x12] <- (fun () -> writeAddress_2(D, E, A); PC <- PC + 1us; 2uy)
 
-opcode.[0x13] <- (fun () -> )
+opcode.[0x13] <- (fun () -> inc16(&D,&E);  PC <- PC + 1us; 2uy)
 
 opcode.[0x14] <- (fun () -> )
 
@@ -147,7 +148,7 @@ opcode.[0x21] <- (fun () -> H <- readAddress(PC + 2us); L <- readAddress(PC + 1u
 
 opcode.[0x22] <- (fun () -> )
 
-opcode.[0x23] <- (fun () -> )
+opcode.[0x23] <- (fun () -> inc16(&H,&L);  PC <- PC + 1us; 2uy)
 
 opcode.[0x24] <- (fun () -> )
 
