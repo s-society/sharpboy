@@ -15,6 +15,7 @@ let orA (n:byte) = A <- A ||| n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF
 let xorA (n:byte) = A <- A ^^^ n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF <- false
 
 let decSP () = SP <- SP - 1us 
+let inc (reg:byte byref) = reg <- reg + 1uy; ZF <- (reg = 0uy) ; NF <- false; HF <- (reg = 0xF0uy)
 let incSP () = SP <- SP + 1us 
 
 opcode.[0x00] <- (fun () -> PC <- PC + 1us; 1uy) //NOP
