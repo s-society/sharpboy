@@ -16,5 +16,5 @@ let mutable NF = false
 let mutable HF = true
 let mutable CF = true
 
-let flag_cons () = byte (((if ZF then 1 else 0 <<< 7 ||| ((if NF then 1 else 0) <<< 6) ||| ((if HF then 1 else 0) <<< 5) ||| ((if CF then 1 else 0) <<< 4)) ||| (F &&& 0x0Fuy) 
+let flag_cons () = byte (((if ZF then 1 else 0) <<< 7) ||| ((if NF then 1 else 0) <<< 6) ||| ((if HF then 1 else 0) <<< 5) ||| ((if CF then 1 else 0) <<< 4)) ||| (F &&& 0x0Fuy) 
 

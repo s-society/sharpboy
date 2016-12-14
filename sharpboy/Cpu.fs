@@ -11,7 +11,7 @@ let andA (n:byte) =  A <- A &&& n ; ZF <- (A = 0uy) ; NF <- false; HF <- true; C
 let decSP () = SP <- SP - 1us 
 let incSP () = SP <- SP + 1us 
 
-opcode.[0x00] <- (fun () -> 
+opcode.[0x00] <- (fun () -> PC <- PC + 1us; 1uy) //NOP
 
 opcode.[0x01] <- (fun () -> 
 
