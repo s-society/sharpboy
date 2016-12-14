@@ -36,6 +36,10 @@ let rla () = temp <- (if CF then 1uy else 0uy) ; CF <- (A &&& 0b10000000uy > 1uy
 let rlc (reg:byte byref) = CF <- (reg &&& 0b10000000uy > 1uy) ; reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
 let ret () = pop(&PC)
 
+let call () = push(PC+3us); jp()
+
+let jr () = PC <- PC + 2us + uint16 (sbyte (readAddress(PC+1us)))
+
 let push (data:uint16) = SP <- SP - 2us ; memory.[int (SP+1us)] <- byte ((data &&& 0xFF00us) >>> 8); memory.[int SP] <- byte (data &&& 0x00FFus) 
 let push_2 (msb:byte, lsb:byte) = SP <- SP - 2us ; memory.[int (SP+1us)] <- msb; memory.[int SP] <- lsb 
 
@@ -71,6 +75,7 @@ let res (b:int, reg:byte byref) = reg <- reg &&& ~~~(1uy <<< b)
 let resHL(b:int) = temp <- readAddress_2(H,L) ; res(b, &temp) ; writeAddress_2(H,L,temp)
 let set (b:int, reg:byte byref) = reg <- reg ||| (1uy <<< b)
 let setHL(b:int) = temp <- readAddress_2(H,L) ; set(b, &temp) ; writeAddress_2(H,L,temp)
+let inc16 (msb:byte byref, lsb:byte byref) = temp16 <- (uint16 msb <<< 8 ||| uint16 lsb) + 1us ; msb <- byte ((temp16 &&& 0xFF00us) >>> 8) ; lsb <- byte (temp16 &&& 0x00FFus)
 
 let opcode = Array.create (0x100) (fun () -> 0uy)
 let CBopcode = Array.create (0x100) (fun () -> 0uy)
@@ -82,11 +87,11 @@ opcode.[0x01] <- (fun () -> B <- readAddress(PC + 2us); C <- readAddress(PC + 1u
 
 opcode.[0x02] <- (fun () -> writeAddress_2(B, C, A); PC <- PC + 1us; 2uy)
 
-opcode.[0x03] <- (fun () -> )
+opcode.[0x03] <- (fun () -> inc16(&B,&C);  PC <- PC + 1us; 2uy)
 
 opcode.[0x04] <- (fun () -> )
 
-opcode.[0x05] <- (fun () -> )
+opcode.[0x05] <- (fun () -> dec(&B); PC <- PC + 1us; 1uy)
 
 opcode.[0x06] <- (fun () -> B <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
@@ -98,11 +103,11 @@ opcode.[0x09] <- (fun () -> )
 
 opcode.[0x0A] <- (fun () -> A <- readAddress_2(B, C); PC <- PC + 1us; 2uy)
 
-opcode.[0x0B] <- (fun () -> )
+opcode.[0x0B] <- (fun () -> dec16(&B,&C);  PC <- PC + 1us; 2uy)
 
 opcode.[0x0C] <- (fun () -> )
 
-opcode.[0x0D] <- (fun () -> )
+opcode.[0x0D] <- (fun () -> dec(&C); PC <- PC + 1us; 1uy)
 
 opcode.[0x0E] <- (fun () -> C <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
@@ -114,65 +119,65 @@ opcode.[0x11] <- (fun () -> D <- readAddress(PC + 2us); E <- readAddress(PC + 1u
 
 opcode.[0x12] <- (fun () -> writeAddress_2(D, E, A); PC <- PC + 1us; 2uy)
 
-opcode.[0x13] <- (fun () -> )
+opcode.[0x13] <- (fun () -> inc16(&D,&E);  PC <- PC + 1us; 2uy)
 
 opcode.[0x14] <- (fun () -> )
 
-opcode.[0x15] <- (fun () -> )
+opcode.[0x15] <- (fun () -> dec(&D); PC <- PC + 1us; 1uy)
 
 opcode.[0x16] <- (fun () -> D <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
 opcode.[0x17] <- (fun () -> rla(); PC <- PC + 1us; 1uy)
 
-opcode.[0x18] <- (fun () -> )
+opcode.[0x18] <- (fun () -> jr(); 3uy)
 
 opcode.[0x19] <- (fun () -> )
 
 opcode.[0x1A] <- (fun () -> A <- readAddress_2(D, E); PC <- PC + 1us; 2uy)
 
-opcode.[0x1B] <- (fun () -> )
+opcode.[0x1B] <- (fun () -> dec16(&D,&E);  PC <- PC + 1us; 2uy)
 
 opcode.[0x1C] <- (fun () -> )
 
-opcode.[0x1D] <- (fun () -> )
+opcode.[0x1D] <- (fun () -> dec(&E); PC <- PC + 1us; 1uy)
 
 opcode.[0x1E] <- (fun () -> E <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
 opcode.[0x1F] <- (fun () -> rra(); PC <- PC + 1us; 1uy)
 
-opcode.[0x20] <- (fun () -> )
+opcode.[0x20] <- (fun () -> if ZF = false then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
 opcode.[0x21] <- (fun () -> H <- readAddress(PC + 2us); L <- readAddress(PC + 1us); PC <- PC + 3us; 3uy)
 
 opcode.[0x22] <- (fun () -> )
 
-opcode.[0x23] <- (fun () -> )
+opcode.[0x23] <- (fun () -> inc16(&H,&L);  PC <- PC + 1us; 2uy)
 
 opcode.[0x24] <- (fun () -> )
 
-opcode.[0x25] <- (fun () -> )
+opcode.[0x25] <- (fun () -> dec(&H); PC <- PC + 1us; 1uy)
 
 opcode.[0x26] <- (fun () -> H <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
 opcode.[0x27] <- (fun () -> daa (); PC <- PC + 1us; 1uy)
 
-opcode.[0x28] <- (fun () -> )
+opcode.[0x28] <- (fun () -> if ZF = true then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
 opcode.[0x29] <- (fun () -> )
 
 opcode.[0x2A] <- (fun () -> )
 
-opcode.[0x2B] <- (fun () -> )
+opcode.[0x2B] <- (fun () -> dec16(&H,&L);  PC <- PC + 1us; 2uy)
 
 opcode.[0x2C] <- (fun () -> )
 
-opcode.[0x2D] <- (fun () -> )
+opcode.[0x2D] <- (fun () -> dec(&L); PC <- PC + 1us; 1uy)
 
 opcode.[0x2E] <- (fun () -> L <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
 opcode.[0x2F] <- (fun () -> )
 
-opcode.[0x30] <- (fun () -> )
+opcode.[0x30] <- (fun () -> if CF = false then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
 opcode.[0x31] <- (fun () -> SP <- readAddress16(PC + 1us); PC <- PC + 3us; 3uy)
 
@@ -182,13 +187,13 @@ opcode.[0x33] <- (fun () -> )
 
 opcode.[0x34] <- (fun () -> )
 
-opcode.[0x35] <- (fun () -> )
+opcode.[0x35] <- (fun () -> decHL(); PC <- PC + 1us; 3uy)
 
 opcode.[0x36] <- (fun () -> writeAddress_2(H, L, readAddress(PC + 1us)); PC <- PC + 2us; 3uy)
 
 opcode.[0x37] <- (fun () -> )
 
-opcode.[0x38] <- (fun () -> )
+opcode.[0x38] <- (fun () -> if CF = true then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
 opcode.[0x39] <- (fun () -> )
 
@@ -462,15 +467,15 @@ opcode.[0xBF] <- (fun () -> cp(A); PC <- PC + 1us; 1uy)
 
 opcode.[0xC0] <- (fun () -> if ZF = false then ret(); 2uy; else PC <- PC + 1us; 2uy)
 
-opcode.[0xC1] <- (fun () -> )
+opcode.[0xC1] <- (fun () -> pop_2(&B,&C);  PC <- PC + 1us; 3uy)
 
 opcode.[0xC2] <- (fun () -> )
 
 opcode.[0xC3] <- (fun () -> )
 
-opcode.[0xC4] <- (fun () -> )
+opcode.[0xC4] <- (fun () -> if ZF = false then call(); 3uy; else PC <- PC + 3us; 3uy)
 
-opcode.[0xC5] <- (fun () -> )
+opcode.[0xC5] <- (fun () -> push_2(B,C);  PC <- PC + 1us; 4uy) 
 
 opcode.[0xC6] <- (fun () -> )
 
@@ -484,9 +489,9 @@ opcode.[0xCA] <- (fun () -> )
 
 opcode.[0xCB] <- (fun () -> )
 
-opcode.[0xCC] <- (fun () -> )
+opcode.[0xCC] <- (fun () -> if ZF = true then call(); 3uy; else PC <- PC + 3us; 3uy)
 
-opcode.[0xCD] <- (fun () -> )
+opcode.[0xCD] <- (fun () -> call(); 3uy)
 
 opcode.[0xCE] <- (fun () -> )
 
@@ -494,15 +499,15 @@ opcode.[0xCF] <- (fun () -> rst(0x8us); 8uy)
 
 opcode.[0xD0] <- (fun () -> if CF = false then ret(); 2uy; else PC <- PC + 1us; 2uy)
 
-opcode.[0xD1] <- (fun () -> )
+opcode.[0xD1] <- (fun () -> pop_2(&D,&E);  PC <- PC + 1us; 3uy)
 
 opcode.[0xD2] <- (fun () -> )
 
 // opcode.[0xD3] <- (fun () -> )
 
-opcode.[0xD4] <- (fun () -> )
+opcode.[0xD4] <- (fun () -> if CF = false then call(); 3uy; else PC <- PC + 3us; 3uy)
 
-opcode.[0xD5] <- (fun () -> )
+opcode.[0xD5] <- (fun () -> push_2(D,E);  PC <- PC + 1us; 4uy)
 
 opcode.[0xD6] <- (fun () -> )
 
@@ -516,7 +521,7 @@ opcode.[0xDA] <- (fun () -> )
 
 // opcode.[0xDB] <- (fun () -> )
 
-opcode.[0xDC] <- (fun () -> )
+opcode.[0xDC] <- (fun () -> if CF = true then call(); 3uy; else PC <- PC + 3us; 3uy)
 
 opcode.[0xDD] <- (fun () -> )
 
@@ -526,7 +531,7 @@ opcode.[0xDF] <- (fun () -> rst(0x18us); 8uy)
 
 opcode.[0xE0] <- (fun () -> )
 
-opcode.[0xE1] <- (fun () -> )
+opcode.[0xE1] <- (fun () -> pop_2(&H,&L);  PC <- PC + 1us; 3uy)
 
 opcode.[0xE2] <- (fun () -> writeAddress(0xFF00us + uint16 C, A); PC <- PC + 1us; 2uy)
 
@@ -534,7 +539,7 @@ opcode.[0xE2] <- (fun () -> writeAddress(0xFF00us + uint16 C, A); PC <- PC + 1us
 
 // opcode.[0xE4] <- (fun () -> )
 
-opcode.[0xE5] <- (fun () -> )
+opcode.[0xE5] <- (fun () -> push_2(H,L);  PC <- PC + 1us; 4uy) 
 
 opcode.[0xE6] <- (fun () -> )
 
@@ -558,7 +563,7 @@ opcode.[0xEF] <- (fun () -> rst(0x28us); 8uy)
 
 opcode.[0xF0] <- (fun () -> )
 
-opcode.[0xF1] <- (fun () -> )
+opcode.[0xF1] <- (fun () -> popAF();  PC <- PC + 1us; 3uy)
 
 opcode.[0xF2] <- (fun () -> A <- readAddress(0xFF00us + uint16 C); PC <- PC + 1us; 2uy)
 
@@ -566,7 +571,7 @@ opcode.[0xF3] <- (fun () -> )
 
 // opcode.[0xF4] <- (fun () -> )
 
-opcode.[0xF5] <- (fun () -> )
+opcode.[0xF5] <- (fun () -> push_2(A,flag_cons());  PC <- PC + 1us; 4uy)
 
 opcode.[0xF6] <- (fun () -> orA(readAddress(PC+1us)); PC <- PC + 2us; 2uy) 
 
