@@ -1,7 +1,7 @@
 ﻿module Memory
 
 
-let memory = Array.create (0xFFFF+1)
+let memory = Array.create (0xFFFF+1) 0uy
 let mutable temp = 0uy
 
 
