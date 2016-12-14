@@ -35,6 +35,9 @@ let rlca () = CF <- (A &&& 0b10000000uy > 1uy) ; A <- (A <<< 1) ||| (if CF then 
 let rla () = temp <- (if CF then 1uy else 0uy) ; CF <- (A &&& 0b10000000uy > 1uy) ; A <- (A <<< 1) ||| temp ; ZF <- A = 0uy; NF <- false; HF <- false;
 let rlc (reg:byte byref) = CF <- (reg &&& 0b10000000uy > 1uy) ; reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
 let ret () = pop(&PC)
+
+let call () = push(PC+3us); jp()
+
 let jr () = PC <- PC + 2us + uint16 (sbyte (readAddress(PC+1us)))
 
 let push (data:uint16) = SP <- SP - 2us ; memory.[int (SP+1us)] <- byte ((data &&& 0xFF00us) >>> 8); memory.[int SP] <- byte (data &&& 0x00FFus) 
@@ -469,7 +472,7 @@ opcode.[0xC2] <- (fun () -> )
 
 opcode.[0xC3] <- (fun () -> )
 
-opcode.[0xC4] <- (fun () -> )
+opcode.[0xC4] <- (fun () -> if ZF = false then call(); 3uy; else PC <- PC + 3us; 3uy)
 
 opcode.[0xC5] <- (fun () -> push_2(B,C);  PC <- PC + 1us; 4uy) 
 
@@ -485,9 +488,9 @@ opcode.[0xCA] <- (fun () -> )
 
 opcode.[0xCB] <- (fun () -> )
 
-opcode.[0xCC] <- (fun () -> )
+opcode.[0xCC] <- (fun () -> if ZF = true then call(); 3uy; else PC <- PC + 3us; 3uy)
 
-opcode.[0xCD] <- (fun () -> )
+opcode.[0xCD] <- (fun () -> call(); 3uy)
 
 opcode.[0xCE] <- (fun () -> )
 
@@ -501,7 +504,7 @@ opcode.[0xD2] <- (fun () -> )
 
 // opcode.[0xD3] <- (fun () -> )
 
-opcode.[0xD4] <- (fun () -> )
+opcode.[0xD4] <- (fun () -> if CF = false then call(); 3uy; else PC <- PC + 3us; 3uy)
 
 opcode.[0xD5] <- (fun () -> push_2(D,E);  PC <- PC + 1us; 4uy)
 
@@ -517,7 +520,7 @@ opcode.[0xDA] <- (fun () -> )
 
 // opcode.[0xDB] <- (fun () -> )
 
-opcode.[0xDC] <- (fun () -> )
+opcode.[0xDC] <- (fun () -> if CF = true then call(); 3uy; else PC <- PC + 3us; 3uy)
 
 opcode.[0xDD] <- (fun () -> )
 
