@@ -8,7 +8,7 @@ open Instruction
 let decSP () = SP <- SP - 1us 
 let incSP () = SP <- SP + 1us 
 
-opcode.[0x00] <- (fun () -> 
+opcode.[0x00] <- (fun () -> PC <- PC + 1us; 1uy) //NOP
 
 opcode.[0x01] <- (fun () -> 
 
