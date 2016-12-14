@@ -2,15 +2,18 @@
 
 open Memory
 open Register
-open Instruction
+
+
 
 let bit (b:int, reg:byte) = ZF <- ((reg &&& (1uy <<< b)) = 0uy); NF <- false; HF <- true
 let bitHL (b:int) = bit(b, readAddress_2(H,L))
 let adcA (n:byte) = Memory.temp <- (if CF then 1uy else 0uy) ; NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy) + Memory.temp) > 0x0Fuy ; CF <- (int A + int n + int Memory.temp) > 0xFF ; A <- A + n + Memory.temp ; ZF <- A = 0uy
 let addA (n:byte) = NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy)) > 0x0Fuy ; CF <- (A + n) < A ; A <- A + n ; ZF <- A = 0uy
 let andA (n:byte) =  A <- A &&& n ; ZF <- (A = 0uy) ; NF <- false; HF <- true; CF <- false
+let dec (reg:byte byref) = reg <- reg - 1uy; ZF <- (reg = 0uy) ; NF <- true; HF <- (reg = 0x0Fuy)
 let orA (n:byte) = A <- A ||| n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF <- false 
 let xorA (n:byte) = A <- A ^^^ n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF <- false
+
 let decSP () = SP <- SP - 1us 
 let incSP () = SP <- SP + 1us 
 
