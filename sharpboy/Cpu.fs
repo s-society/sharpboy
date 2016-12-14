@@ -19,12 +19,15 @@ let decHL () = temp <- readAddress_2(H,L) ; dec(&temp) ; writeAddress_2(H,L,temp
 
 let decSP () = SP <- SP - 1us 
 let inc (reg:byte byref) = reg <- reg + 1uy; ZF <- (reg = 0uy) ; NF <- false; HF <- (reg = 0xF0uy)
+let incrementHL(inc:bool) = temp16 <- uint16 H <<< 8 ||| uint16 L ; (if inc then temp16 <- temp16 + 1us else temp16 <- temp16 - 1us) ; H <- byte ((temp16 &&& 0xFF00us) >>> 8) ;  L <- byte (temp16 &&& 0x00FFus)
 let incSP () = SP <- SP + 1us 
 let jp () = PC <- readAddress16(PC + 1us)
 let jpHL () = PC <- uint16 H <<< 8 ||| uint16 L
 let pop (into:uint16 byref) = into <- ((uint16 memory.[int (SP+1us)] <<< 8) ||| uint16 memory.[int SP]) ; SP <- SP + 2us
 let pop_2 (msb:byte byref, lsb:byte byref) = msb <- memory.[int (SP+1us)] ; lsb <- memory.[int SP] ; SP <- SP + 2us  
 let popAF() = pop_2(&A,&F) ; ZF <- (F &&& (1uy <<< 7)) > 1uy ; NF <- (F &&& (1uy <<< 6)) > 1uy ; HF <- (F &&& (1uy <<< 5)) > 1uy ; CF <- (F &&& (1uy <<< 4)) > 1uy
+let push (data:uint16) = SP <- SP - 2us ; memory.[int (SP+1us)] <- byte ((data &&& 0xFF00us) >>> 8); memory.[int SP] <- byte (data &&& 0x00FFus) 
+let push_2 (msb:byte, lsb:byte) = SP <- SP - 2us ; memory.[int (SP+1us)] <- msb; memory.[int SP] <- lsb 
 let rst (n:uint16) = push(PC+1us); PC <- n
 let rrca () = CF <- ( A &&& 1uy >= 1uy) ; A <- (A >>> 1) ||| (if CF then (1uy<<<7) else 0uy) ; ZF <- A = 0uy; NF <- false; HF <- false;
 let rra () = temp <- (if CF then 1uy else 0uy) ; CF <- (A &&& 1uy >= 1uy) ; A <- (A >>> 1) ||| (temp<<<7) ; ZF <- A = 0uy; NF <- false; HF <- false;
@@ -32,6 +35,7 @@ let rlca () = CF <- (A &&& 0b10000000uy > 1uy) ; A <- (A <<< 1) ||| (if CF then 
 let rla () = temp <- (if CF then 1uy else 0uy) ; CF <- (A &&& 0b10000000uy > 1uy) ; A <- (A <<< 1) ||| temp ; ZF <- A = 0uy; NF <- false; HF <- false;
 let rlc (reg:byte byref) = CF <- (reg &&& 0b10000000uy > 1uy) ; reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
 let ret () = pop(&PC)
+
 let push (data:uint16) = SP <- SP - 2us ; memory.[int (SP+1us)] <- byte ((data &&& 0xFF00us) >>> 8); memory.[int SP] <- byte (data &&& 0x00FFus) 
 let push_2 (msb:byte, lsb:byte) = SP <- SP - 2us ; memory.[int (SP+1us)] <- msb; memory.[int SP] <- lsb 
 
@@ -47,6 +51,7 @@ let daa () =
     A <- result
 
 let rlc (reg:byte byref) = CF <- (if reg &&& 0b10000000uy > 1uy then true else false) ; reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
+
 let rlcHL () = temp <- readAddress_2(H,L) ; rlc(&temp); writeAddress_2(H,L, temp)
 let rrc (reg:byte byref) = CF <- (reg &&& 1uy >= 1uy) ; reg <- (reg >>> 1) ||| (if CF then (1uy<<<7) else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
 let rrcHL () = temp <- readAddress_2(H,L) ; rrc(&temp); writeAddress_2(H,L, temp)
