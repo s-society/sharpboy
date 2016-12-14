@@ -86,7 +86,7 @@ opcode.[0x03] <- (fun () -> )
 
 opcode.[0x04] <- (fun () -> )
 
-opcode.[0x05] <- (fun () -> )
+opcode.[0x05] <- (fun () -> dec(&B); PC <- PC + 1us; 1uy)
 
 opcode.[0x06] <- (fun () -> B <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
@@ -98,11 +98,11 @@ opcode.[0x09] <- (fun () -> )
 
 opcode.[0x0A] <- (fun () -> A <- readAddress_2(B, C); PC <- PC + 1us; 2uy)
 
-opcode.[0x0B] <- (fun () -> )
+opcode.[0x0B] <- (fun () -> dec16(&B,&C);  PC <- PC + 1us; 2uy)
 
 opcode.[0x0C] <- (fun () -> )
 
-opcode.[0x0D] <- (fun () -> )
+opcode.[0x0D] <- (fun () -> dec(&C); PC <- PC + 1us; 1uy)
 
 opcode.[0x0E] <- (fun () -> C <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
@@ -118,7 +118,7 @@ opcode.[0x13] <- (fun () -> )
 
 opcode.[0x14] <- (fun () -> )
 
-opcode.[0x15] <- (fun () -> )
+opcode.[0x15] <- (fun () -> dec(&D); PC <- PC + 1us; 1uy)
 
 opcode.[0x16] <- (fun () -> D <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
@@ -130,11 +130,11 @@ opcode.[0x19] <- (fun () -> )
 
 opcode.[0x1A] <- (fun () -> A <- readAddress_2(D, E); PC <- PC + 1us; 2uy)
 
-opcode.[0x1B] <- (fun () -> )
+opcode.[0x1B] <- (fun () -> dec16(&D,&E);  PC <- PC + 1us; 2uy)
 
 opcode.[0x1C] <- (fun () -> )
 
-opcode.[0x1D] <- (fun () -> )
+opcode.[0x1D] <- (fun () -> dec(&E); PC <- PC + 1us; 1uy)
 
 opcode.[0x1E] <- (fun () -> E <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
@@ -150,7 +150,7 @@ opcode.[0x23] <- (fun () -> )
 
 opcode.[0x24] <- (fun () -> )
 
-opcode.[0x25] <- (fun () -> )
+opcode.[0x25] <- (fun () -> dec(&H); PC <- PC + 1us; 1uy)
 
 opcode.[0x26] <- (fun () -> H <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
@@ -162,11 +162,11 @@ opcode.[0x29] <- (fun () -> )
 
 opcode.[0x2A] <- (fun () -> )
 
-opcode.[0x2B] <- (fun () -> )
+opcode.[0x2B] <- (fun () -> dec16(&H,&L);  PC <- PC + 1us; 2uy)
 
 opcode.[0x2C] <- (fun () -> )
 
-opcode.[0x2D] <- (fun () -> )
+opcode.[0x2D] <- (fun () -> dec(&L); PC <- PC + 1us; 1uy)
 
 opcode.[0x2E] <- (fun () -> L <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
@@ -182,7 +182,7 @@ opcode.[0x33] <- (fun () -> )
 
 opcode.[0x34] <- (fun () -> )
 
-opcode.[0x35] <- (fun () -> )
+opcode.[0x35] <- (fun () -> decHL(); PC <- PC + 1us; 3uy)
 
 opcode.[0x36] <- (fun () -> writeAddress_2(H, L, readAddress(PC + 1us)); PC <- PC + 2us; 3uy)
 
