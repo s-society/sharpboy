@@ -3,6 +3,7 @@
 
 let memory = Array.create (0xFFFF+1) 0uy
 let mutable temp = 0uy
+let mutable temp16 = 0us
 
 
 // Keep track of different memory places
