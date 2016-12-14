@@ -84,6 +84,12 @@ let inc (reg:byte byref) =
      NF <- false
      HF <- (reg = 0xF0uy)
 
+let incrementHL(inc:bool) =
+     temp16 <- uint16 H <<< 8 ||| uint16 L
+     (if inc then temp16 <- temp16 + 1us else temp16 <- temp16 - 1us)
+     H <- byte ((temp16 &&& 0xFF00us) >>> 8) 
+     L <- byte (temp16 &&& 0x00FFus)
+
 let incSP () = SP <- SP + 1us 
 
 let jp () = PC <- readAddress16(PC + 1us)
