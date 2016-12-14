@@ -3,8 +3,6 @@
 open Memory
 open Register
 
-
-
 let bit (b:int, reg:byte) = ZF <- ((reg &&& (1uy <<< b)) = 0uy); NF <- false; HF <- true
 let bitHL (b:int) = bit(b, readAddress_2(H,L))
 let adcA (n:byte) = Memory.temp <- (if CF then 1uy else 0uy) ; NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy) + Memory.temp) > 0x0Fuy ; CF <- (int A + int n + int Memory.temp) > 0xFF ; A <- A + n + Memory.temp ; ZF <- A = 0uy
@@ -13,10 +11,16 @@ let andA (n:byte) =  A <- A &&& n ; ZF <- (A = 0uy) ; NF <- false; HF <- true; C
 let dec (reg:byte byref) = reg <- reg - 1uy; ZF <- (reg = 0uy) ; NF <- true; HF <- (reg = 0x0Fuy)
 let orA (n:byte) = A <- A ||| n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF <- false 
 let xorA (n:byte) = A <- A ^^^ n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF <- false
+let subA (n:byte) = NF <- true ; HF <- (A &&& 0x0Fuy) < (n &&& 0x0Fuy) ; CF <- A < n ; A <- A - n ; ZF <- A = 0uy
+let sbcA (n:byte) = temp <- (if CF then 1uy else 0uy) ; NF <- true ; HF <- (A &&& 0x0Fuy) < ((n &&& 0x0Fuy)+temp) ; CF <- A < (n + temp); A <- A - n - temp ; ZF <- A = 0uy
+let cp (n:byte) = ZF <- (A = n) ; NF <- true; HF <- (A &&& 0x0Fuy) < (n &&& 0x0Fuy); CF <- A < n;
 
 let decSP () = SP <- SP - 1us 
 let inc (reg:byte byref) = reg <- reg + 1uy; ZF <- (reg = 0uy) ; NF <- false; HF <- (reg = 0xF0uy)
 let incSP () = SP <- SP + 1us 
+let jp () = PC <- readAddress16(PC + 1us)
+let jpHL () = PC <- uint16 H <<< 8 ||| uint16 L
+
 
 let rlc (reg:byte byref) = CF <- (if reg &&& 0b10000000uy > 1uy then true else false) ; reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
 let rlcHL () = temp <- readAddress_2(H,L) ; rlc(&temp); writeAddress_2(H,L, temp)
@@ -39,263 +43,264 @@ let resHL(b:int) = temp <- readAddress_2(H,L) ; res(b, &temp) ; writeAddress_2(H
 let set (b:int, reg:byte byref) = reg <- reg ||| (1uy <<< b)
 let setHL(b:int) = temp <- readAddress_2(H,L) ; set(b, &temp) ; writeAddress_2(H,L,temp)
 
+let opcode = Array.create 0x100 (fun () -> 0uy)
 let CBopcode = Array.create (0x100) (fun () -> 0uy)
 
 opcode.[0x00] <- (fun () -> PC <- PC + 1us; 1uy) //NOP
 
-opcode.[0x01] <- (fun () -> 
+opcode.[0x01] <- (fun () -> )
 
-opcode.[0x02] <- (fun () -> 
+opcode.[0x02] <- (fun () -> )
 
-opcode.[0x03] <- (fun () -> 
+opcode.[0x03] <- (fun () -> )
 
-opcode.[0x04] <- (fun () -> 
+opcode.[0x04] <- (fun () -> )
 
-opcode.[0x05] <- (fun () -> 
+opcode.[0x05] <- (fun () -> )
 
-opcode.[0x06] <- (fun () -> 
+opcode.[0x06] <- (fun () -> )
 
-opcode.[0x07] <- (fun () -> 
+opcode.[0x07] <- (fun () -> )
 
-opcode.[0x08] <- (fun () -> 
+opcode.[0x08] <- (fun () -> )
 
-opcode.[0x09] <- (fun () -> 
+opcode.[0x09] <- (fun () -> )
 
-opcode.[0x0A] <- (fun () -> 
+opcode.[0x0A] <- (fun () -> )
 
-opcode.[0x0B] <- (fun () -> 
+opcode.[0x0B] <- (fun () -> )
 
-opcode.[0x0C] <- (fun () -> 
+opcode.[0x0C] <- (fun () -> )
 
-opcode.[0x0D] <- (fun () -> 
+opcode.[0x0D] <- (fun () -> )
 
-opcode.[0x0E] <- (fun () -> 
+opcode.[0x0E] <- (fun () -> )
 
-opcode.[0x0F] <- (fun () -> 
+opcode.[0x0F] <- (fun () -> )
 
-opcode.[0x10] <- (fun () -> 
+opcode.[0x10] <- (fun () -> )
 
-opcode.[0x11] <- (fun () -> 
+opcode.[0x11] <- (fun () -> )
 
-opcode.[0x12] <- (fun () -> 
+opcode.[0x12] <- (fun () -> )
 
-opcode.[0x13] <- (fun () -> 
+opcode.[0x13] <- (fun () -> )
 
-opcode.[0x14] <- (fun () -> 
+opcode.[0x14] <- (fun () -> )
 
-opcode.[0x15] <- (fun () -> 
+opcode.[0x15] <- (fun () -> )
 
-opcode.[0x16] <- (fun () -> 
+opcode.[0x16] <- (fun () -> )
 
-opcode.[0x17] <- (fun () -> 
+opcode.[0x17] <- (fun () -> )
 
-opcode.[0x18] <- (fun () -> 
+opcode.[0x18] <- (fun () -> )
 
-opcode.[0x19] <- (fun () -> 
+opcode.[0x19] <- (fun () -> )
 
-opcode.[0x1A] <- (fun () -> 
+opcode.[0x1A] <- (fun () -> )
 
-opcode.[0x1B] <- (fun () -> 
+opcode.[0x1B] <- (fun () -> )
 
-opcode.[0x1C] <- (fun () -> 
+opcode.[0x1C] <- (fun () -> )
 
-opcode.[0x1D] <- (fun () -> 
+opcode.[0x1D] <- (fun () -> )
 
-opcode.[0x1E] <- (fun () -> 
+opcode.[0x1E] <- (fun () -> )
 
-opcode.[0x1F] <- (fun () -> 
+opcode.[0x1F] <- (fun () -> )
 
-opcode.[0x20] <- (fun () -> 
+opcode.[0x20] <- (fun () -> )
 
-opcode.[0x21] <- (fun () -> 
+opcode.[0x21] <- (fun () -> )
 
-opcode.[0x22] <- (fun () -> 
+opcode.[0x22] <- (fun () -> )
 
-opcode.[0x23] <- (fun () -> 
+opcode.[0x23] <- (fun () -> )
 
-opcode.[0x24] <- (fun () -> 
+opcode.[0x24] <- (fun () -> )
 
-opcode.[0x25] <- (fun () -> 
+opcode.[0x25] <- (fun () -> )
 
-opcode.[0x26] <- (fun () -> 
+opcode.[0x26] <- (fun () -> )
 
-opcode.[0x27] <- (fun () -> 
+opcode.[0x27] <- (fun () -> )
 
-opcode.[0x28] <- (fun () -> 
+opcode.[0x28] <- (fun () -> )
 
-opcode.[0x29] <- (fun () -> 
+opcode.[0x29] <- (fun () -> )
 
-opcode.[0x2A] <- (fun () -> 
+opcode.[0x2A] <- (fun () -> )
 
-opcode.[0x2B] <- (fun () -> 
+opcode.[0x2B] <- (fun () -> )
 
-opcode.[0x2C] <- (fun () -> 
+opcode.[0x2C] <- (fun () -> )
 
-opcode.[0x2D] <- (fun () -> 
+opcode.[0x2D] <- (fun () -> )
 
-opcode.[0x2E] <- (fun () -> 
+opcode.[0x2E] <- (fun () -> )
 
-opcode.[0x2F] <- (fun () -> 
+opcode.[0x2F] <- (fun () -> )
 
-opcode.[0x30] <- (fun () -> 
+opcode.[0x30] <- (fun () -> )
 
-opcode.[0x31] <- (fun () -> 
+opcode.[0x31] <- (fun () -> )
 
-opcode.[0x32] <- (fun () -> 
+opcode.[0x32] <- (fun () -> )
 
-opcode.[0x33] <- (fun () -> 
+opcode.[0x33] <- (fun () -> )
 
-opcode.[0x34] <- (fun () -> 
+opcode.[0x34] <- (fun () -> )
 
-opcode.[0x35] <- (fun () -> 
+opcode.[0x35] <- (fun () -> )
 
-opcode.[0x36] <- (fun () -> 
+opcode.[0x36] <- (fun () -> )
 
-opcode.[0x37] <- (fun () -> 
+opcode.[0x37] <- (fun () -> )
 
-opcode.[0x38] <- (fun () -> 
+opcode.[0x38] <- (fun () -> )
 
-opcode.[0x39] <- (fun () -> 
+opcode.[0x39] <- (fun () -> )
 
-opcode.[0x3A] <- (fun () -> 
+opcode.[0x3A] <- (fun () -> )
 
-opcode.[0x3B] <- (fun () -> 
+opcode.[0x3B] <- (fun () -> )
 
-opcode.[0x3C] <- (fun () -> 
+opcode.[0x3C] <- (fun () -> )
 
-opcode.[0x3D] <- (fun () -> 
+opcode.[0x3D] <- (fun () -> )
 
-opcode.[0x3E] <- (fun () -> 
+opcode.[0x3E] <- (fun () -> )
 
-opcode.[0x3F] <- (fun () -> 
+opcode.[0x3F] <- (fun () -> )
 
-opcode.[0x40] <- (fun () -> 
+opcode.[0x40] <- (fun () -> )
 
-opcode.[0x41] <- (fun () -> 
+opcode.[0x41] <- (fun () -> )
 
-opcode.[0x42] <- (fun () -> 
+opcode.[0x42] <- (fun () -> )
 
-opcode.[0x43] <- (fun () -> 
+opcode.[0x43] <- (fun () -> )
 
-opcode.[0x44] <- (fun () -> 
+opcode.[0x44] <- (fun () -> )
 
-opcode.[0x45] <- (fun () -> 
+opcode.[0x45] <- (fun () -> )
 
-opcode.[0x46] <- (fun () -> 
+opcode.[0x46] <- (fun () -> )
 
-opcode.[0x47] <- (fun () -> 
+opcode.[0x47] <- (fun () -> )
 
-opcode.[0x48] <- (fun () -> 
+opcode.[0x48] <- (fun () -> )
 
-opcode.[0x49] <- (fun () -> 
+opcode.[0x49] <- (fun () -> )
 
-opcode.[0x4A] <- (fun () -> 
+opcode.[0x4A] <- (fun () -> )
 
-opcode.[0x4B] <- (fun () -> 
+opcode.[0x4B] <- (fun () -> )
 
-opcode.[0x4C] <- (fun () -> 
+opcode.[0x4C] <- (fun () -> )
 
-opcode.[0x4D] <- (fun () -> 
+opcode.[0x4D] <- (fun () -> )
 
-opcode.[0x4E] <- (fun () -> 
+opcode.[0x4E] <- (fun () -> )
 
-opcode.[0x4F] <- (fun () -> 
+opcode.[0x4F] <- (fun () -> )
 
-opcode.[0x50] <- (fun () -> 
+opcode.[0x50] <- (fun () -> )
 
-opcode.[0x51] <- (fun () -> 
+opcode.[0x51] <- (fun () -> )
 
-opcode.[0x52] <- (fun () -> 
+opcode.[0x52] <- (fun () -> )
 
-opcode.[0x53] <- (fun () -> 
+opcode.[0x53] <- (fun () -> )
 
-opcode.[0x54] <- (fun () -> 
+opcode.[0x54] <- (fun () -> )
 
-opcode.[0x55] <- (fun () -> 
+opcode.[0x55] <- (fun () -> )
 
-opcode.[0x56] <- (fun () -> 
+opcode.[0x56] <- (fun () -> )
 
-opcode.[0x57] <- (fun () -> 
+opcode.[0x57] <- (fun () -> )
 
-opcode.[0x58] <- (fun () -> 
+opcode.[0x58] <- (fun () -> )
 
-opcode.[0x59] <- (fun () -> 
+opcode.[0x59] <- (fun () -> )
 
-opcode.[0x5A] <- (fun () -> 
+opcode.[0x5A] <- (fun () -> )
 
-opcode.[0x5B] <- (fun () -> 
+opcode.[0x5B] <- (fun () -> )
 
-opcode.[0x5C] <- (fun () -> 
+opcode.[0x5C] <- (fun () -> )
 
-opcode.[0x5D] <- (fun () -> 
+opcode.[0x5D] <- (fun () -> )
 
-opcode.[0x5E] <- (fun () -> 
+opcode.[0x5E] <- (fun () -> )
 
-opcode.[0x5F] <- (fun () -> 
+opcode.[0x5F] <- (fun () -> )
 
-opcode.[0x60] <- (fun () -> 
+opcode.[0x60] <- (fun () -> )
 
-opcode.[0x61] <- (fun () -> 
+opcode.[0x61] <- (fun () -> )
 
-opcode.[0x62] <- (fun () -> 
+opcode.[0x62] <- (fun () -> )
 
-opcode.[0x63] <- (fun () -> 
+opcode.[0x63] <- (fun () -> )
 
-opcode.[0x64] <- (fun () -> 
+opcode.[0x64] <- (fun () -> )
 
-opcode.[0x65] <- (fun () -> 
+opcode.[0x65] <- (fun () -> )
 
-opcode.[0x66] <- (fun () -> 
+opcode.[0x66] <- (fun () -> )
 
-opcode.[0x67] <- (fun () -> 
+opcode.[0x67] <- (fun () -> )
 
-opcode.[0x68] <- (fun () -> 
+opcode.[0x68] <- (fun () -> )
 
-opcode.[0x69] <- (fun () -> 
+opcode.[0x69] <- (fun () -> )
 
-opcode.[0x6A] <- (fun () -> 
+opcode.[0x6A] <- (fun () -> )
 
-opcode.[0x6B] <- (fun () -> 
+opcode.[0x6B] <- (fun () -> )
 
-opcode.[0x6C] <- (fun () -> 
+opcode.[0x6C] <- (fun () -> )
 
-opcode.[0x6D] <- (fun () -> 
+opcode.[0x6D] <- (fun () -> )
 
-opcode.[0x6E] <- (fun () -> 
+opcode.[0x6E] <- (fun () -> )
 
-opcode.[0x6F] <- (fun () -> 
+opcode.[0x6F] <- (fun () -> )
 
-opcode.[0x70] <- (fun () -> 
+opcode.[0x70] <- (fun () -> )
 
-opcode.[0x71] <- (fun () -> 
+opcode.[0x71] <- (fun () -> )
 
-opcode.[0x72] <- (fun () -> 
+opcode.[0x72] <- (fun () -> )
 
-opcode.[0x73] <- (fun () -> 
+opcode.[0x73] <- (fun () -> )
 
-opcode.[0x74] <- (fun () -> 
+opcode.[0x74] <- (fun () -> )
 
-opcode.[0x75] <- (fun () -> 
+opcode.[0x75] <- (fun () -> )
 
-opcode.[0x76] <- (fun () -> 
+opcode.[0x76] <- (fun () -> )
 
-opcode.[0x77] <- (fun () -> 
+opcode.[0x77] <- (fun () -> )
 
-opcode.[0x78] <- (fun () -> 
+opcode.[0x78] <- (fun () -> )
 
-opcode.[0x79] <- (fun () -> 
+opcode.[0x79] <- (fun () -> )
 
-opcode.[0x7A] <- (fun () -> 
+opcode.[0x7A] <- (fun () -> )
 
-opcode.[0x7B] <- (fun () -> 
+opcode.[0x7B] <- (fun () -> )
 
-opcode.[0x7C] <- (fun () -> 
+opcode.[0x7C] <- (fun () -> )
 
-opcode.[0x7D] <- (fun () -> 
+opcode.[0x7D] <- (fun () -> )
 
-opcode.[0x7E] <- (fun () -> 
+opcode.[0x7E] <- (fun () -> )
 
-opcode.[0x7F] <- (fun () -> 
+opcode.[0x7F] <- (fun () -> )
 
 opcode.[0x80] <- (fun () -> addA(B) ; PC <- PC + 1us; 1uy) 
 
@@ -329,37 +334,37 @@ opcode.[0x8E] <- (fun () -> adcA(readAddress_2(H, L)); PC <- PC + 1us; 2uy)
 
 opcode.[0x8F] <- (fun () -> adcA(A) ; PC <- PC + 1us; 1uy)
 
-opcode.[0x90] <- (fun () -> 
+opcode.[0x90] <- (fun () -> subA(B); PC <- PC + 1us; 1uy) 
 
-opcode.[0x91] <- (fun () -> 
+opcode.[0x91] <- (fun () -> subA(C); PC <- PC + 1us; 1uy) 
 
-opcode.[0x92] <- (fun () -> 
+opcode.[0x92] <- (fun () -> subA(D); PC <- PC + 1us; 1uy) 
 
-opcode.[0x93] <- (fun () -> 
+opcode.[0x93] <- (fun () -> subA(E); PC <- PC + 1us; 1uy) 
 
-opcode.[0x94] <- (fun () -> 
+opcode.[0x94] <- (fun () -> subA(H); PC <- PC + 1us; 1uy) 
 
-opcode.[0x95] <- (fun () -> 
+opcode.[0x95] <- (fun () -> subA(L); PC <- PC + 1us; 1uy) 
 
-opcode.[0x96] <- (fun () -> 
+opcode.[0x96] <- (fun () -> subA(readAddress_2(H, L)); PC <- PC + 1us; 2uy)
 
-opcode.[0x97] <- (fun () -> 
+opcode.[0x97] <- (fun () -> subA(A); PC <- PC + 1us; 1uy) 
 
-opcode.[0x98] <- (fun () -> 
+opcode.[0x98] <- (fun () -> sbcA(B); PC <- PC + 1us; 1uy)
 
-opcode.[0x99] <- (fun () -> 
+opcode.[0x99] <- (fun () -> sbcA(C); PC <- PC + 1us; 1uy)
 
-opcode.[0x9A] <- (fun () -> 
+opcode.[0x9A] <- (fun () -> sbcA(D); PC <- PC + 1us; 1uy)
 
-opcode.[0x9B] <- (fun () -> 
+opcode.[0x9B] <- (fun () -> sbcA(E); PC <- PC + 1us; 1uy)
 
-opcode.[0x9C] <- (fun () -> 
+opcode.[0x9C] <- (fun () -> sbcA(H); PC <- PC + 1us; 1uy)
 
-opcode.[0x9D] <- (fun () -> 
+opcode.[0x9D] <- (fun () -> sbcA(L); PC <- PC + 1us; 1uy)
 
-opcode.[0x9E] <- (fun () -> 
+opcode.[0x9E] <- (fun () -> sbcA(readAddress_2(H, L)); PC <- PC + 1us; 2uy)
 
-opcode.[0x9F] <- (fun () -> 
+opcode.[0x9F] <- (fun () -> sbcA(A); PC <- PC + 1us; 1uy)
 
 opcode.[0xA0] <- (fun () -> andA(B); PC <- PC + 1us; 1uy) 
 
@@ -373,7 +378,7 @@ opcode.[0xA4] <- (fun () -> andA(H); PC <- PC + 1us; 1uy)
 
 opcode.[0xA5] <- (fun () -> andA(L); PC <- PC + 1us; 1uy) 
 
-opcode.[0xA6] <- (fun () -> andA(readAddress_2(H, L)); PC <- PC + 1us; 2uy)     
+opcode.[0xA6] <- (fun () -> andA(readAddress_2(H, L)); PC <- PC + 1us; 2uy
 
 opcode.[0xA7] <- (fun () -> andA(A); PC <- PC + 1us; 1uy) 
 
@@ -409,151 +414,149 @@ opcode.[0xB6] <- (fun () -> orA(readAddress_2(H, L)); PC <- PC + 1us; 2uy)
 
 opcode.[0xB7] <- (fun () -> orA(A); PC <- PC + 1us; 1uy) 
 
-opcode.[0xB8] <- (fun () -> 
+opcode.[0xB8] <- (fun () -> cp(B); PC <- PC + 1us; 1uy)
 
-opcode.[0xB9] <- (fun () -> 
+opcode.[0xB9] <- (fun () -> cp(C); PC <- PC + 1us; 1uy)
 
-opcode.[0xBA] <- (fun () -> 
+opcode.[0xBA] <- (fun () -> cp(D); PC <- PC + 1us; 1uy)
 
-opcode.[0xBB] <- (fun () -> 
+opcode.[0xBB] <- (fun () -> cp(E); PC <- PC + 1us; 1uy)
 
-opcode.[0xBC] <- (fun () -> 
+opcode.[0xBC] <- (fun () -> cp(H); PC <- PC + 1us; 1uy)
 
-opcode.[0xBD] <- (fun () -> 
+opcode.[0xBD] <- (fun () -> cp(L); PC <- PC + 1us; 1uy)
 
-opcode.[0xBE] <- (fun () -> 
+opcode.[0xBE] <- (fun () -> cp(readAddress_2(H, L)); PC <- PC + 1us; 2uy)
 
-opcode.[0xBF] <- (fun () -> 
+opcode.[0xBF] <- (fun () -> cp(A); PC <- PC + 1us; 1uy)
 
-opcode.[0xC0] <- (fun () -> 
+opcode.[0xC0] <- (fun () -> )
 
-opcode.[0xC1] <- (fun () -> 
+opcode.[0xC1] <- (fun () -> )
 
-opcode.[0xC2] <- (fun () -> 
+opcode.[0xC2] <- (fun () -> )
 
-opcode.[0xC3] <- (fun () -> 
+opcode.[0xC3] <- (fun () -> )
 
-opcode.[0xC4] <- (fun () -> 
+opcode.[0xC4] <- (fun () -> )
 
-opcode.[0xC5] <- (fun () -> 
+opcode.[0xC5] <- (fun () -> )
 
-opcode.[0xC6] <- (fun () -> 
+opcode.[0xC6] <- (fun () -> )
 
-opcode.[0xC7] <- (fun () -> 
+opcode.[0xC7] <- (fun () -> )
 
-opcode.[0xC8] <- (fun () -> 
+opcode.[0xC8] <- (fun () -> )
 
-opcode.[0xC9] <- (fun () -> 
+opcode.[0xC9] <- (fun () -> )
 
-opcode.[0xCA] <- (fun () -> 
+opcode.[0xCA] <- (fun () -> )
 
-opcode.[0xCB] <- (fun () -> 
+opcode.[0xCB] <- (fun () -> )
 
-opcode.[0xCC] <- (fun () -> 
+opcode.[0xCC] <- (fun () -> )
 
-opcode.[0xCD] <- (fun () -> 
+opcode.[0xCD] <- (fun () -> )
 
-opcode.[0xCE] <- (fun () -> 
+opcode.[0xCE] <- (fun () -> )
 
-opcode.[0xCF] <- (fun () -> 
+opcode.[0xCF] <- (fun () -> )
 
-opcode.[0xD0] <- (fun () -> 
+opcode.[0xD0] <- (fun () -> )
 
-opcode.[0xD1] <- (fun () -> 
+opcode.[0xD1] <- (fun () -> )
 
-opcode.[0xD2] <- (fun () -> 
+opcode.[0xD2] <- (fun () -> )
 
-opcode.[0xD3] <- (fun () -> 
+opcode.[0xD3] <- (fun () -> )
 
-opcode.[0xD4] <- (fun () -> 
+opcode.[0xD4] <- (fun () -> )
 
-opcode.[0xD5] <- (fun () -> 
+opcode.[0xD5] <- (fun () -> )
 
-opcode.[0xD6] <- (fun () -> 
+opcode.[0xD6] <- (fun () -> )
 
-opcode.[0xD7] <- (fun () -> 
+opcode.[0xD7] <- (fun () -> )
 
-opcode.[0xD8] <- (fun () -> 
+opcode.[0xD8] <- (fun () -> )
 
-opcode.[0xD9] <- (fun () -> 
+opcode.[0xD9] <- (fun () -> )
 
-opcode.[0xDA] <- (fun () -> 
+opcode.[0xDA] <- (fun () -> )
 
-opcode.[0xDB] <- (fun () -> 
+opcode.[0xDB] <- (fun () -> )
 
-opcode.[0xDC] <- (fun () -> 
+opcode.[0xDC] <- (fun () -> )
 
-opcode.[0xDD] <- (fun () -> 
+opcode.[0xDD] <- (fun () -> )
 
-opcode.[0xDE] <- (fun () -> 
+opcode.[0xDE] <- (fun () -> )
 
-opcode.[0xDF] <- (fun () -> 
+opcode.[0xDF] <- (fun () -> )
 
-opcode.[0xE0] <- (fun () -> 
+opcode.[0xE0] <- (fun () -> )
 
-opcode.[0xE1] <- (fun () -> 
+opcode.[0xE1] <- (fun () -> )
 
-opcode.[0xE2] <- (fun () -> 
+opcode.[0xE2] <- (fun () -> )
 
-opcode.[0xE3] <- (fun () -> 
+opcode.[0xE3] <- (fun () -> )
 
-opcode.[0xE4] <- (fun () -> 
+opcode.[0xE4] <- (fun () -> )
 
-opcode.[0xE5] <- (fun () -> 
+opcode.[0xE5] <- (fun () -> )
 
-opcode.[0xE6] <- (fun () -> 
+opcode.[0xE6] <- (fun () -> )
 
-opcode.[0xE7] <- (fun () -> 
+opcode.[0xE7] <- (fun () -> )
 
-opcode.[0xE8] <- (fun () -> 
+opcode.[0xE8] <- (fun () -> )
 
-opcode.[0xE9] <- (fun () -> 
+opcode.[0xE9] <- (fun () -> )
 
-opcode.[0xEA] <- (fun () -> 
+opcode.[0xEA] <- (fun () -> )
 
-opcode.[0xEB] <- (fun () -> 
+opcode.[0xEB] <- (fun () -> )
 
-opcode.[0xEC] <- (fun () -> 
+opcode.[0xEC] <- (fun () -> )
 
-opcode.[0xED] <- (fun () -> 
+opcode.[0xED] <- (fun () -> )
 
 opcode.[0xEE] <- (fun () -> xorA(readAddress(PC+1us)); PC <- PC + 2us; 2uy) 
 
-opcode.[0xEF] <- (fun () -> 
+opcode.[0xEF] <- (fun () -> )
 
-opcode.[0xF0] <- (fun () -> 
+opcode.[0xF0] <- (fun () -> )
 
-opcode.[0xF1] <- (fun () -> 
+opcode.[0xF1] <- (fun () -> )
 
-opcode.[0xF2] <- (fun () -> 
+opcode.[0xF2] <- (fun () -> )
 
-opcode.[0xF3] <- (fun () -> 
+opcode.[0xF3] <- (fun () -> )
 
-opcode.[0xF4] <- (fun () -> 
+opcode.[0xF4] <- (fun () -> )
 
-opcode.[0xF5] <- (fun () -> 
+opcode.[0xF5] <- (fun () -> )
 
 opcode.[0xF6] <- (fun () -> orA(readAddress(PC+1us)); PC <- PC + 2us; 2uy) 
 
-opcode.[0xF7] <- (fun () -> 
+opcode.[0xF7] <- (fun () -> )
 
-opcode.[0xF8] <- (fun () -> 
+opcode.[0xF8] <- (fun () -> )
 
-opcode.[0xF9] <- (fun () -> 
+opcode.[0xF9] <- (fun () -> )
 
-opcode.[0xFA] <- (fun () -> 
+opcode.[0xFA] <- (fun () -> )
 
-opcode.[0xFB] <- (fun () -> 
+opcode.[0xFB] <- (fun () -> )
 
-opcode.[0xFC] <- (fun () -> 
+opcode.[0xFC] <- (fun () -> )
 
-opcode.[0xFD] <- (fun () -> 
+opcode.[0xFD] <- (fun () -> )
 
-opcode.[0xFE] <- (fun () -> 
+opcode.[0xFE] <- (fun () -> )
 
-opcode.[0xFF] <- (fun () -> 
-
-
+opcode.[0xFF] <- (fun () -> )
 
 CBopcode.[0x00] <- (fun () -> rlc(&B);    PC <- PC + 1us; 2uy)
 
