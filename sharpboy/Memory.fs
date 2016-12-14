@@ -2,16 +2,19 @@
 
 
 let memory = Array.create (0xFFFF+1) 0uy
+let mutable temp = 0uy
+let mutable temp16 = 0us
 
-// keep track of different memory places
+
+// Keep track of different memory places
 let ROM0 = (0us, 0x3FFFus) // ROM 0 (16 KB)
 let ROM1 = (0x4000us, 0x7FFFus) // ROM 1 (16 KB)
-let VRAM = (0x8000us,0x9FFFus) // VIDEO RAM (8KB)
-let IRAM = (0xC000us,0xDFFFus) // INTERNAL RAM (8KB)
-let ECHO = (0xE000us,0xFDFFus) // ECHO OF INTERNAL RAM
-let OAM = (0xFE00us, 0xFE9Fus) // OBJECT ATTRIBUTE MEMORY
+let VRAM = (0x8000us,0x9FFFus) // Video RAM (8KB)
+let IRAM = (0xC000us,0xDFFFus) // Interal RAM (8KB)
+let ECHO = (0xE000us,0xFDFFus) // Echo of internal RAM
+let OAM = (0xFE00us, 0xFE9Fus) // Object attribute memory
 
-let mutable P14, P15 = 0xEFuy,0xDFuy //JOYPAD OUT PORTS
+let mutable P14, P15 = 0xEFuy,0xDFuy //Joypad out ports
 
 let P1,DIV,TAC,WY,WX = 0xFF00us,0xFF04us,0xFF07us,0xFF4Aus,0xFF4Bus 
 let LCDC,STAT,SCROLLY,SCROLLX = 0xFF40us, 0xFF41us, 0xFF42us, 0xFF43us 
@@ -112,3 +115,4 @@ let readAddress (address:uint16) =
 let readAddress_2 (msb:byte, lsb: byte) = readAddress((uint16 msb <<< 8) ||| uint16 lsb)
 let readAddress16 (address:uint16) = uint16 (readAddress(address+1us)) <<< 8 ||| uint16 (readAddress(address))
 let readAddress16_2 (msb:byte, lsb: byte) = readAddress16(uint16 msb <<< 8 ||| uint16 lsb)
+
