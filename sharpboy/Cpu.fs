@@ -3,6 +3,26 @@
 open Memory
 open Register
 
+let addHL (m:byte, l:byte) =
+    let hl = (uint16 H <<< 8 ||| uint16 L)
+    let reg = (uint16 m <<< 8 ||| uint16 l)
+    let sum = hl + reg
+    CF <- sum < hl
+    HF <- ((int hl &&& 0x0FFF)+(int reg &&& 0x0FFF)) > 0x0FFF 
+    H <- byte ((sum &&& 0xFF00us) >>> 8) 
+    L <- byte (sum &&& 0x00FFus)
+    NF <- false
+
+let addHLSP () = addHL(byte ((SP &&& 0xFF00us) >>> 8), byte (SP &&& 0x00FFus))
+
+let addSP () = 
+    let sum = SP + uint16 (sbyte (readAddress(PC+1us)))
+    CF <- (int SP + int (sbyte (readAddress(PC+1us)))) > 0xFFFF
+    HF <- ((int SP &&& 0x0FFF)+(int (sbyte (readAddress(PC+1us))) &&& 0x0FFF)) > 0x0FFF 
+    SP <- sum
+    ZF <- false
+    NF <- false
+
 let bit (b:int, reg:byte) =
      ZF <- ((reg &&& (1uy <<< b)) = 0uy)
      NF <- false
@@ -340,7 +360,7 @@ opcode.[0x07] <- (fun () -> rlca(); PC <- PC + 1us; 1uy)
 
 opcode.[0x08] <- (fun () -> writeAddress16_2(readAddress(PC + 2us), readAddress(PC + 1us), SP); PC <- PC + 3us; 5uy)
 
-opcode.[0x09] <- (fun () -> )
+opcode.[0x09] <- (fun () -> addHL(B,C);  PC <- PC + 1us; 2uy)
 
 opcode.[0x0A] <- (fun () -> A <- readAddress_2(B, C); PC <- PC + 1us; 2uy)
 
@@ -372,7 +392,7 @@ opcode.[0x17] <- (fun () -> rla(); PC <- PC + 1us; 1uy)
 
 opcode.[0x18] <- (fun () -> jr(); 3uy)
 
-opcode.[0x19] <- (fun () -> )
+opcode.[0x19] <- (fun () -> addHL(D,E);  PC <- PC + 1us; 2uy)
 
 opcode.[0x1A] <- (fun () -> A <- readAddress_2(D, E); PC <- PC + 1us; 2uy)
 
@@ -404,7 +424,7 @@ opcode.[0x27] <- (fun () -> daa (); PC <- PC + 1us; 1uy)
 
 opcode.[0x28] <- (fun () -> if ZF = true then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
-opcode.[0x29] <- (fun () -> )
+opcode.[0x29] <- (fun () -> addHL(H,L);  PC <- PC + 1us; 2uy)
 
 opcode.[0x2A] <- (fun () -> )
 
@@ -436,7 +456,7 @@ opcode.[0x37] <- (fun () -> )
 
 opcode.[0x38] <- (fun () -> if CF = true then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
-opcode.[0x39] <- (fun () -> )
+opcode.[0x39] <-  (fun () -> addHLSP();  PC <- PC + 1us; 2uy)
 
 opcode.[0x3A] <- (fun () -> )
 
@@ -786,7 +806,7 @@ opcode.[0xE6] <- (fun () -> )
 
 opcode.[0xE7] <- (fun () -> rst(0x20us); 8uy)
 
-opcode.[0xE8] <- (fun () -> )
+opcode.[0xE8] <- (fun () -> addSP();  PC <- PC + 2us; 4uy)
 
 opcode.[0xE9] <- (fun () -> )
 
