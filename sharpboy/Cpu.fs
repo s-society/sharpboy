@@ -7,6 +7,8 @@ open Instruction
 
 let decSP () = SP <- SP - 1us 
 let incSP () = SP <- SP + 1us 
+let jp () = PC <- readAddress16(PC + 1us)
+let jpHL () = PC <- uint16 H <<< 8 ||| uint16 L
 
 opcode.[0x00] <- (fun () -> PC <- PC + 1us; 1uy) //NOP
 
