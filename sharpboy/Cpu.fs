@@ -18,7 +18,6 @@ let addHLSP () = addHL(byte ((SP &&& 0xFF00us) >>> 8), byte (SP &&& 0x00FFus))
 let addSP () = 
     let sum = SP + uint16 (sbyte (readAddress(PC+1us)))
     CF <- (int SP + int (sbyte (readAddress(PC+1us)))) > 0xFFFF
-    //CF <- sum < SP
     HF <- ((int SP &&& 0x0FFF)+(int (sbyte (readAddress(PC+1us))) &&& 0x0FFF)) > 0x0FFF 
     SP <- sum
     ZF <- false
