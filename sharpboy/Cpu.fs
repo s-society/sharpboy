@@ -23,6 +23,8 @@ let jpHL () = PC <- uint16 H <<< 8 ||| uint16 L
 let pop (into:uint16 byref) = into <- ((uint16 memory.[int (SP+1us)] <<< 8) ||| uint16 memory.[int SP]) ; SP <- SP + 2us
 let pop_2 (msb:byte byref, lsb:byte byref) = msb <- memory.[int (SP+1us)] ; lsb <- memory.[int SP] ; SP <- SP + 2us  
 let popAF() = pop_2(&A,&F) ; ZF <- (F &&& (1uy <<< 7)) > 1uy ; NF <- (F &&& (1uy <<< 6)) > 1uy ; HF <- (F &&& (1uy <<< 5)) > 1uy ; CF <- (F &&& (1uy <<< 4)) > 1uy
+let push (data:uint16) = SP <- SP - 2us ; memory.[int (SP+1us)] <- byte ((data &&& 0xFF00us) >>> 8); memory.[int SP] <- byte (data &&& 0x00FFus) 
+let push_2 (msb:byte, lsb:byte) = SP <- SP - 2us ; memory.[int (SP+1us)] <- msb; memory.[int SP] <- lsb 
 
 
 
