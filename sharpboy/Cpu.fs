@@ -448,7 +448,7 @@ opcode.[0x3D] <- (fun () -> )
 
 opcode.[0x3E] <- (fun () -> A <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
-opcode.[0x3F] <- (fun () -> )
+opcode.[0x3F] <- (fun () -> NF <- false; HF <- false; CF <- not CF ; PC <- PC + 1us; 1uy)
 
 opcode.[0x40] <- (fun () -> B <- B; PC <- PC + 1us; 1uy)
 
