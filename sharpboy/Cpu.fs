@@ -5,6 +5,7 @@ open Register
 open Instruction
 
 
+let dec (reg:byte byref) = reg <- reg - 1uy; ZF <- (reg = 0uy) ; NF <- true; HF <- (reg = 0x0Fuy)
 let decSP () = SP <- SP - 1us 
 let incSP () = SP <- SP + 1us 
 
