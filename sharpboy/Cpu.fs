@@ -15,6 +15,8 @@ let xorA (n:byte) = A <- A ^^^ n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; C
 let decSP () = SP <- SP - 1us 
 let inc (reg:byte byref) = reg <- reg + 1uy; ZF <- (reg = 0uy) ; NF <- false; HF <- (reg = 0xF0uy)
 let incSP () = SP <- SP + 1us 
+let jp () = PC <- readAddress16(PC + 1us)
+let jpHL () = PC <- uint16 H <<< 8 ||| uint16 L
 
 let opcode = Array.create 0x100 (fun () -> 0uy)
 
