@@ -3,51 +3,231 @@
 open Memory
 open Register
 
-let bit (b:int, reg:byte) = ZF <- ((reg &&& (1uy <<< b)) = 0uy); NF <- false; HF <- true
+
+let bit (b:int, reg:byte) = 
+    ZF <- ((reg &&& (1uy <<< b)) = 0uy)
+    NF <- false
+    HF <- true
+
 let bitHL (b:int) = bit(b, readAddress_2(H,L))
-let adcA (n:byte) = Memory.temp <- (if CF then 1uy else 0uy) ; NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy) + Memory.temp) > 0x0Fuy ; CF <- (int A + int n + int Memory.temp) > 0xFF ; A <- A + n + Memory.temp ; ZF <- A = 0uy
-let addA (n:byte) = NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy)) > 0x0Fuy ; CF <- (A + n) < A ; A <- A + n ; ZF <- A = 0uy
-let andA (n:byte) =  A <- A &&& n ; ZF <- (A = 0uy) ; NF <- false; HF <- true; CF <- false
-let dec (reg:byte byref) = reg <- reg - 1uy; ZF <- (reg = 0uy) ; NF <- true; HF <- (reg = 0x0Fuy)
-let orA (n:byte) = A <- A ||| n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF <- false 
-let xorA (n:byte) = A <- A ^^^ n ; ZF <- (A = 0uy) ; NF <- false; HF <- false; CF <- false
-let subA (n:byte) = NF <- true ; HF <- (A &&& 0x0Fuy) < (n &&& 0x0Fuy) ; CF <- A < n ; A <- A - n ; ZF <- A = 0uy
-let sbcA (n:byte) = temp <- (if CF then 1uy else 0uy) ; NF <- true ; HF <- (A &&& 0x0Fuy) < ((n &&& 0x0Fuy)+temp) ; CF <- A < (n + temp); A <- A - n - temp ; ZF <- A = 0uy
-let cp (n:byte) = ZF <- (A = n) ; NF <- true; HF <- (A &&& 0x0Fuy) < (n &&& 0x0Fuy); CF <- A < n;
+
+let adcA (n:byte) = 
+     Memory.temp <- (if CF then 1uy else 0uy) 
+     NF <- false 
+     HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy) + Memory.temp) > 0x0Fuy 
+     CF <- (int A + int n + int Memory.temp) > 0xFF 
+     A <- A + n + Memory.temp 
+     ZF <- A = 0uy
+
+let addA (n:byte) = 
+     NF <- false 
+     HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy)) > 0x0Fuy 
+     CF <- (A + n) < A 
+     A <- A + n 
+     ZF <- A = 0uy
+
+let andA (n:byte) =
+     A <- A &&& n 
+     ZF <- (A = 0uy) 
+     NF <- false
+     HF <- true
+     CF <- false
+
+let dec (reg:byte byref) =
+     reg <- reg - 1uy
+     ZF <- (reg = 0uy) 
+     NF <- true
+     HF <- (reg = 0x0Fuy)
+
+let orA (n:byte) =
+     A <- A ||| n 
+     ZF <- (A = 0uy) 
+     NF <- false
+     HF <- false
+     CF <- false 
+
+let xorA (n:byte) =
+     A <- A ^^^ n 
+     ZF <- (A = 0uy) 
+     NF <- false
+     HF <- false
+     CF <- false
+
+let subA (n:byte) =
+     NF <- true 
+     HF <- (A &&& 0x0Fuy) < (n &&& 0x0Fuy) 
+     CF <- A < n 
+     A <- A - n 
+     ZF <- A = 0uy
+
+let sbcA (n:byte) =
+     temp <- (if CF then 1uy else 0uy) 
+     NF <- true 
+     HF <- (A &&& 0x0Fuy) < ((n &&& 0x0Fuy)+temp) 
+     CF <- A < (n + temp)
+     A <- A - n - temp 
+     ZF <- A = 0uy
+
+let cp (n:byte) =
+     ZF <- (A = n) 
+     NF <- true
+     HF <- (A &&& 0x0Fuy) < (n &&& 0x0Fuy)
+     CF <- A < n
+    
+
 
 let decSP () = SP <- SP - 1us 
-let inc (reg:byte byref) = reg <- reg + 1uy; ZF <- (reg = 0uy) ; NF <- false; HF <- (reg = 0xF0uy)
+
+let inc (reg:byte byref) =
+     reg <- reg + 1uy
+     ZF <- (reg = 0uy) 
+     NF <- false
+     HF <- (reg = 0xF0uy)
+
 let incSP () = SP <- SP + 1us 
+
 let jp () = PC <- readAddress16(PC + 1us)
+
 let jpHL () = PC <- uint16 H <<< 8 ||| uint16 L
-let pop (into:uint16 byref) = into <- ((uint16 memory.[int (SP+1us)] <<< 8) ||| uint16 memory.[int SP]) ; SP <- SP + 2us
-let pop_2 (msb:byte byref, lsb:byte byref) = msb <- memory.[int (SP+1us)] ; lsb <- memory.[int SP] ; SP <- SP + 2us  
-let popAF() = pop_2(&A,&F) ; ZF <- (F &&& (1uy <<< 7)) > 1uy ; NF <- (F &&& (1uy <<< 6)) > 1uy ; HF <- (F &&& (1uy <<< 5)) > 1uy ; CF <- (F &&& (1uy <<< 4)) > 1uy
+
+let pop (into:uint16 byref) =
+     into <- ((uint16 memory.[int (SP+1us)] <<< 8) ||| uint16 memory.[int SP]) 
+     SP <- SP + 2us
+
+let pop_2 (msb:byte byref, lsb:byte byref) =
+     msb <- memory.[int (SP+1us)] 
+     lsb <- memory.[int SP] 
+     SP <- SP + 2us  
+
+let popAF() =
+     pop_2(&A,&F) 
+     ZF <- (F &&& (1uy <<< 7)) > 1uy 
+     NF <- (F &&& (1uy <<< 6)) > 1uy 
+     HF <- (F &&& (1uy <<< 5)) > 1uy 
+     CF <- (F &&& (1uy <<< 4)) > 1uy
 
 
 
-let rlc (reg:byte byref) = CF <- (if reg &&& 0b10000000uy > 1uy then true else false) ; reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
-let rlcHL () = temp <- readAddress_2(H,L) ; rlc(&temp); writeAddress_2(H,L, temp)
-let rrc (reg:byte byref) = CF <- (if reg &&& 1uy >= 1uy then true else false) ; reg <- (reg >>> 1) ||| (if CF then (1uy<<<7) else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
-let rrcHL () = temp <- readAddress_2(H,L) ; rrc(&temp); writeAddress_2(H,L, temp)
-let rl (reg:byte byref) = temp <- (if CF then 1uy else 0uy) ; CF <- (if reg &&& 0b10000000uy > 1uy then true else false) ; reg <- (reg <<< 1) ||| temp ; ZF <- reg = 0uy; NF <- false; HF <- false;
-let rlHL() = temp <- readAddress_2(H,L) ; rl(&temp); writeAddress_2(H,L, temp)
-let rr (reg:byte byref) = temp <- (if CF then 1uy else 0uy) ; CF <- (if reg &&& 1uy >= 1uy then true else false) ; reg <- (reg >>> 1) ||| (temp<<<7) ; ZF <- reg = 0uy; NF <- false; HF <- false;
-let rrHL() = temp <- readAddress_2(H,L) ; rr(&temp); writeAddress_2(H,L, temp)
-let sla (reg:byte byref) = CF <- (if reg &&& 0b10000000uy > 1uy then true else false) ; reg <- reg <<< 1 ; ZF <- reg = 0uy; NF <- false ; HF <- false
-let slaHL () = temp <- readAddress_2(H,L) ; sla(&temp); writeAddress_2(H,L, temp)
-let sra (reg:byte byref) = CF <- (if reg &&& 1uy >= 1uy then true else false) ; reg <- (reg >>> 1) ||| (reg &&& 0b10000000uy); ZF <- reg = 0uy; NF <- false ; HF <- false
-let sraHL () = temp <- readAddress_2(H,L) ; sra(&temp); writeAddress_2(H,L, temp)
-let swap (reg:byte byref) = reg <- (((reg &&& 0xF0uy) >>> 4) ||| ((reg &&& 0xFuy) <<< 4)); ZF <- (reg = 0uy) ; NF <- false ; HF <- false ; CF <- false
-let swapHL () = temp <- readAddress_2(H, L) ; swap(&temp) ; writeAddress_2(H, L, temp)
-let srl (reg:byte byref) = CF <- (if reg &&& 1uy >= 1uy then true else false) ; reg <- reg >>> 1 ; ZF <- reg = 0uy; NF <- false ; HF <- false
-let srlHL () = temp <- readAddress_2(H,L) ; srl(&temp); writeAddress_2(H,L, temp)
+
+let rlc (reg:byte byref) =
+     CF <- (if reg &&& 0b10000000uy > 1uy then true else false) 
+     reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) 
+     ZF <- reg = 0uy
+     NF <- false
+     HF <- false
+    
+
+let rlcHL () =
+     temp <- readAddress_2(H,L) 
+     rlc(&temp)
+     writeAddress_2(H,L, temp)
+
+let rrc (reg:byte byref) =
+     CF <- (if reg &&& 1uy >= 1uy then true else false) 
+     reg <- (reg >>> 1) ||| (if CF then (1uy<<<7) else 0uy) 
+     ZF <- reg = 0uy
+     NF <- false
+     HF <- false
+    
+
+let rrcHL () =
+     temp <- readAddress_2(H,L) 
+     rrc(&temp)
+     writeAddress_2(H,L, temp)
+
+let rl (reg:byte byref) =
+     temp <- (if CF then 1uy else 0uy) 
+     CF <- (if reg &&& 0b10000000uy > 1uy then true else false) 
+     reg <- (reg <<< 1) ||| temp 
+     ZF <- reg = 0uy
+     NF <- false
+     HF <- false
+    
+
+let rlHL() =
+     temp <- readAddress_2(H,L) 
+     rl(&temp)
+     writeAddress_2(H,L, temp)
+
+let rr (reg:byte byref) =
+     temp <- (if CF then 1uy else 0uy) 
+     CF <- (if reg &&& 1uy >= 1uy then true else false) 
+     reg <- (reg >>> 1) ||| (temp<<<7) 
+     ZF <- reg = 0uy
+     NF <- false
+     HF <- false
+    
+
+let rrHL() =
+     temp <- readAddress_2(H,L) 
+     rr(&temp)
+     writeAddress_2(H,L, temp)
+
+let sla (reg:byte byref) =
+     CF <- (if reg &&& 0b10000000uy > 1uy then true else false) 
+     reg <- reg <<< 1 
+     ZF <- reg = 0uy
+     NF <- false 
+     HF <- false
+
+let slaHL () =
+     temp <- readAddress_2(H,L) 
+     sla(&temp)
+     writeAddress_2(H,L, temp)
+
+let sra (reg:byte byref) =
+     CF <- (if reg &&& 1uy >= 1uy then true else false) 
+     reg <- (reg >>> 1) ||| (reg &&& 0b10000000uy)
+     ZF <- reg = 0uy
+     NF <- false 
+     HF <- false
+
+let sraHL () =
+     temp <- readAddress_2(H,L) 
+     sra(&temp)
+     writeAddress_2(H,L, temp)
+
+let swap (reg:byte byref) =
+     reg <- (((reg &&& 0xF0uy) >>> 4) ||| ((reg &&& 0xFuy) <<< 4))
+     ZF <- (reg = 0uy) 
+     NF <- false 
+     HF <- false 
+     CF <- false
+
+let swapHL () =
+     temp <- readAddress_2(H, L) 
+     swap(&temp) 
+     writeAddress_2(H, L, temp)
+
+let srl (reg:byte byref) =
+     CF <- (if reg &&& 1uy >= 1uy then true else false) 
+     reg <- reg >>> 1 
+     ZF <- reg = 0uy
+     NF <- false 
+     HF <- false
+
+let srlHL () =
+     temp <- readAddress_2(H,L) 
+     srl(&temp)
+     writeAddress_2(H,L, temp)
+
 let res (b:int, reg:byte byref) = reg <- reg &&& ~~~(1uy <<< b)
-let resHL(b:int) = temp <- readAddress_2(H,L) ; res(b, &temp) ; writeAddress_2(H,L,temp)
+
+let resHL(b:int) =
+     temp <- readAddress_2(H,L) 
+     res(b, &temp) 
+     writeAddress_2(H,L,temp)
+
 let set (b:int, reg:byte byref) = reg <- reg ||| (1uy <<< b)
-let setHL(b:int) = temp <- readAddress_2(H,L) ; set(b, &temp) ; writeAddress_2(H,L,temp)
+
+let setHL(b:int) =
+     temp <- readAddress_2(H,L) 
+     set(b, &temp) 
+     writeAddress_2(H,L,temp)
+
 
 let opcode = Array.create 0x100 (fun () -> 0uy)
+
 let CBopcode = Array.create (0x100) (fun () -> 0uy)
 
 
