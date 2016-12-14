@@ -526,7 +526,7 @@ opcode.[0xDF] <- (fun () -> rst(0x18us); 8uy)
 
 opcode.[0xE0] <- (fun () -> )
 
-opcode.[0xE1] <- (pop_2(&H,&L);  PC <- PC + 1us; 3uy)
+opcode.[0xE1] <- (fun () -> pop_2(&H,&L);  PC <- PC + 1us; 3uy)
 
 opcode.[0xE2] <- (fun () -> writeAddress(0xFF00us + uint16 C, A); PC <- PC + 1us; 2uy)
 
