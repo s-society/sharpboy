@@ -4,7 +4,8 @@ open Memory
 open Register
 open Instruction
 
-
+let bit (b:int, reg:byte) = ZF <- ((reg &&& (1uy <<< b)) = 0uy); NF <- false; HF <- true
+let bitHL (b:int) = bit(b, readAddress_2(H,L))
 let decSP () = SP <- SP - 1us 
 let incSP () = SP <- SP + 1us 
 
