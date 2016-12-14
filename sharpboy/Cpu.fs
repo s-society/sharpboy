@@ -4,7 +4,7 @@ open Memory
 open Register
 open Instruction
 
-let adcA (n:byte) = temp <- (if CF then 1uy else 0uy) ; NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy) + temp) > 0x0Fuy ; CF <- (int A + int n + int temp) > 0xFF ; A <- A + n + temp ; ZF <- A = 0uy
+let adcA (n:byte) = Memory.temp <- (if CF then 1uy else 0uy) ; NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy) + Memory.temp) > 0x0Fuy ; CF <- (int A + int n + int Memory.temp) > 0xFF ; A <- A + n + Memory.temp ; ZF <- A = 0uy
 let addA (n:byte) = NF <- false ; HF <- ((A &&& 0x0Fuy) + (n &&& 0x0Fuy)) > 0x0Fuy ; CF <- (A + n) < A ; A <- A + n ; ZF <- A = 0uy
 let andA (n:byte) =  A <- A &&& n ; ZF <- (A = 0uy) ; NF <- false; HF <- true; CF <- false 
 
