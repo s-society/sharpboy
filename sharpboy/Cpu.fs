@@ -462,7 +462,7 @@ opcode.[0xBF] <- (fun () -> cp(A); PC <- PC + 1us; 1uy)
 
 opcode.[0xC0] <- (fun () -> if ZF = false then ret(); 2uy; else PC <- PC + 1us; 2uy)
 
-opcode.[0xC1] <- (fun () -> )
+opcode.[0xC1] <- (fun () -> pop_2(&B,&C);  PC <- PC + 1us; 3uy)
 
 opcode.[0xC2] <- (fun () -> )
 
@@ -470,7 +470,7 @@ opcode.[0xC3] <- (fun () -> )
 
 opcode.[0xC4] <- (fun () -> )
 
-opcode.[0xC5] <- (fun () -> )
+opcode.[0xC5] <- (fun () -> push_2(B,C);  PC <- PC + 1us; 4uy) 
 
 opcode.[0xC6] <- (fun () -> )
 
@@ -494,7 +494,7 @@ opcode.[0xCF] <- (fun () -> rst(0x8us); 8uy)
 
 opcode.[0xD0] <- (fun () -> if CF = false then ret(); 2uy; else PC <- PC + 1us; 2uy)
 
-opcode.[0xD1] <- (fun () -> )
+opcode.[0xD1] <- (fun () -> pop_2(&D,&E);  PC <- PC + 1us; 3uy)
 
 opcode.[0xD2] <- (fun () -> )
 
@@ -502,7 +502,7 @@ opcode.[0xD2] <- (fun () -> )
 
 opcode.[0xD4] <- (fun () -> )
 
-opcode.[0xD5] <- (fun () -> )
+opcode.[0xD5] <- (fun () -> push_2(D,E);  PC <- PC + 1us; 4uy)
 
 opcode.[0xD6] <- (fun () -> )
 
@@ -526,7 +526,7 @@ opcode.[0xDF] <- (fun () -> rst(0x18us); 8uy)
 
 opcode.[0xE0] <- (fun () -> )
 
-opcode.[0xE1] <- (fun () -> )
+opcode.[0xE1] <- (fun () -> pop_2(&H,&L);  PC <- PC + 1us; 3uy)
 
 opcode.[0xE2] <- (fun () -> writeAddress(0xFF00us + uint16 C, A); PC <- PC + 1us; 2uy)
 
@@ -534,7 +534,7 @@ opcode.[0xE2] <- (fun () -> writeAddress(0xFF00us + uint16 C, A); PC <- PC + 1us
 
 // opcode.[0xE4] <- (fun () -> )
 
-opcode.[0xE5] <- (fun () -> )
+opcode.[0xE5] <- (fun () -> push_2(H,L);  PC <- PC + 1us; 4uy) 
 
 opcode.[0xE6] <- (fun () -> )
 
@@ -558,7 +558,7 @@ opcode.[0xEF] <- (fun () -> rst(0x28us); 8uy)
 
 opcode.[0xF0] <- (fun () -> )
 
-opcode.[0xF1] <- (fun () -> )
+opcode.[0xF1] <- (fun () -> popAF();  PC <- PC + 1us; 3uy)
 
 opcode.[0xF2] <- (fun () -> A <- readAddress(0xFF00us + uint16 C); PC <- PC + 1us; 2uy)
 
@@ -566,7 +566,7 @@ opcode.[0xF3] <- (fun () -> )
 
 // opcode.[0xF4] <- (fun () -> )
 
-opcode.[0xF5] <- (fun () -> )
+opcode.[0xF5] <- (fun () -> push_2(A,flag_cons());  PC <- PC + 1us; 4uy)
 
 opcode.[0xF6] <- (fun () -> orA(readAddress(PC+1us)); PC <- PC + 2us; 2uy) 
 
