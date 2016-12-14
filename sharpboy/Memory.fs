@@ -24,6 +24,11 @@ let IF,IE = 0xFF0Fus, 0xFFFFus
 let TIMA,TMA = 0xFF05us,0xFF06us
 let TAC_TIMER_STOP_BIT = 2
 
+let mutable IME = false
+let mutable unhandledCBOpcode = false
+let mutable stopped = false
+let mutable cbOpCycles = 0uy
+
 let STAT_MODE_00_HBLANK,STAT_MODE_01_VBLANK,STAT_MODE_10_OAM,STAT_MODE_11_OAM_RAM = 0b00uy,0b01uy,0b10uy,0b11uy
 let STAT_MODE_00_BIT,STAT_MODE_01_BIT,STAT_MODE_10_BIT,STAT_LY_LYC_BIT = 3,4,5,6
 
