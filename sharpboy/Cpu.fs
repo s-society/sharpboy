@@ -35,6 +35,7 @@ let rlca () = CF <- (A &&& 0b10000000uy > 1uy) ; A <- (A <<< 1) ||| (if CF then 
 let rla () = temp <- (if CF then 1uy else 0uy) ; CF <- (A &&& 0b10000000uy > 1uy) ; A <- (A <<< 1) ||| temp ; ZF <- A = 0uy; NF <- false; HF <- false;
 let rlc (reg:byte byref) = CF <- (reg &&& 0b10000000uy > 1uy) ; reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
 let ret () = pop(&PC)
+let jr () = PC <- PC + 2us + uint16 (sbyte (readAddress(PC+1us)))
 
 let push (data:uint16) = SP <- SP - 2us ; memory.[int (SP+1us)] <- byte ((data &&& 0xFF00us) >>> 8); memory.[int SP] <- byte (data &&& 0x00FFus) 
 let push_2 (msb:byte, lsb:byte) = SP <- SP - 2us ; memory.[int (SP+1us)] <- msb; memory.[int SP] <- lsb 
@@ -124,7 +125,7 @@ opcode.[0x16] <- (fun () -> D <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
 opcode.[0x17] <- (fun () -> rla(); PC <- PC + 1us; 1uy)
 
-opcode.[0x18] <- (fun () -> )
+opcode.[0x18] <- (fun () -> jr(); 3uy)
 
 opcode.[0x19] <- (fun () -> )
 
@@ -140,7 +141,7 @@ opcode.[0x1E] <- (fun () -> E <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
 opcode.[0x1F] <- (fun () -> rra(); PC <- PC + 1us; 1uy)
 
-opcode.[0x20] <- (fun () -> )
+opcode.[0x20] <- (fun () -> if ZF = false then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
 opcode.[0x21] <- (fun () -> H <- readAddress(PC + 2us); L <- readAddress(PC + 1us); PC <- PC + 3us; 3uy)
 
@@ -156,7 +157,7 @@ opcode.[0x26] <- (fun () -> H <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
 opcode.[0x27] <- (fun () -> daa (); PC <- PC + 1us; 1uy)
 
-opcode.[0x28] <- (fun () -> )
+opcode.[0x28] <- (fun () -> if ZF = true then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
 opcode.[0x29] <- (fun () -> )
 
@@ -172,7 +173,7 @@ opcode.[0x2E] <- (fun () -> L <- readAddress(PC + 1us); PC <- PC + 2us; 2uy)
 
 opcode.[0x2F] <- (fun () -> )
 
-opcode.[0x30] <- (fun () -> )
+opcode.[0x30] <- (fun () -> if CF = false then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
 opcode.[0x31] <- (fun () -> SP <- readAddress16(PC + 1us); PC <- PC + 3us; 3uy)
 
@@ -188,7 +189,7 @@ opcode.[0x36] <- (fun () -> writeAddress_2(H, L, readAddress(PC + 1us)); PC <- P
 
 opcode.[0x37] <- (fun () -> )
 
-opcode.[0x38] <- (fun () -> )
+opcode.[0x38] <- (fun () -> if CF = true then jr(); 3uy; else PC <- PC + 2us; 2uy)
 
 opcode.[0x39] <- (fun () -> )
 
