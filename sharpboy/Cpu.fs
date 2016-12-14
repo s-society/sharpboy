@@ -18,6 +18,29 @@ let decSP () = SP <- SP - 1us
 let inc (reg:byte byref) = reg <- reg + 1uy; ZF <- (reg = 0uy) ; NF <- false; HF <- (reg = 0xF0uy)
 let incSP () = SP <- SP + 1us 
 
+let rlc (reg:byte byref) = CF <- (if reg &&& 0b10000000uy > 1uy then true else false) ; reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
+let rlcHL () = temp <- readAddress_2(H,L) ; rlc(&temp); writeAddress_2(H,L, temp)
+let rrc (reg:byte byref) = CF <- (if reg &&& 1uy >= 1uy then true else false) ; reg <- (reg >>> 1) ||| (if CF then (1uy<<<7) else 0uy) ; ZF <- reg = 0uy; NF <- false; HF <- false;
+let rrcHL () = temp <- readAddress_2(H,L) ; rrc(&temp); writeAddress_2(H,L, temp)
+let rl (reg:byte byref) = temp <- (if CF then 1uy else 0uy) ; CF <- (if reg &&& 0b10000000uy > 1uy then true else false) ; reg <- (reg <<< 1) ||| temp ; ZF <- reg = 0uy; NF <- false; HF <- false;
+let rlHL() = temp <- readAddress_2(H,L) ; rl(&temp); writeAddress_2(H,L, temp)
+let rr (reg:byte byref) = temp <- (if CF then 1uy else 0uy) ; CF <- (if reg &&& 1uy >= 1uy then true else false) ; reg <- (reg >>> 1) ||| (temp<<<7) ; ZF <- reg = 0uy; NF <- false; HF <- false;
+let rrHL() = temp <- readAddress_2(H,L) ; rr(&temp); writeAddress_2(H,L, temp)
+let sla (reg:byte byref) = CF <- (if reg &&& 0b10000000uy > 1uy then true else false) ; reg <- reg <<< 1 ; ZF <- reg = 0uy; NF <- false ; HF <- false
+let slaHL () = temp <- readAddress_2(H,L) ; sla(&temp); writeAddress_2(H,L, temp)
+let sra (reg:byte byref) = CF <- (if reg &&& 1uy >= 1uy then true else false) ; reg <- (reg >>> 1) ||| (reg &&& 0b10000000uy); ZF <- reg = 0uy; NF <- false ; HF <- false
+let sraHL () = temp <- readAddress_2(H,L) ; sra(&temp); writeAddress_2(H,L, temp)
+let swap (reg:byte byref) = reg <- (((reg &&& 0xF0uy) >>> 4) ||| ((reg &&& 0xFuy) <<< 4)); ZF <- (reg = 0uy) ; NF <- false ; HF <- false ; CF <- false
+let swapHL () = temp <- readAddress_2(H, L) ; swap(&temp) ; writeAddress_2(H, L, temp)
+let srl (reg:byte byref) = CF <- (if reg &&& 1uy >= 1uy then true else false) ; reg <- reg >>> 1 ; ZF <- reg = 0uy; NF <- false ; HF <- false
+let srlHL () = temp <- readAddress_2(H,L) ; srl(&temp); writeAddress_2(H,L, temp)
+let res (b:int, reg:byte byref) = reg <- reg &&& ~~~(1uy <<< b)
+let resHL(b:int) = temp <- readAddress_2(H,L) ; res(b, &temp) ; writeAddress_2(H,L,temp)
+let set (b:int, reg:byte byref) = reg <- reg ||| (1uy <<< b)
+let setHL(b:int) = temp <- readAddress_2(H,L) ; set(b, &temp) ; writeAddress_2(H,L,temp)
+
+let CBopcode = Array.create (0x100) (fun () -> 0uy)
+
 opcode.[0x00] <- (fun () -> PC <- PC + 1us; 1uy) //NOP
 
 opcode.[0x01] <- (fun () -> 
@@ -350,7 +373,7 @@ opcode.[0xA4] <- (fun () -> andA(H); PC <- PC + 1us; 1uy)
 
 opcode.[0xA5] <- (fun () -> andA(L); PC <- PC + 1us; 1uy) 
 
-opcode.[0xA6] <- (fun () -> andA(readAddress_2(H, L)); PC <- PC + 1us; 2uy) 	
+opcode.[0xA6] <- (fun () -> andA(readAddress_2(H, L)); PC <- PC + 1us; 2uy)     
 
 opcode.[0xA7] <- (fun () -> andA(A); PC <- PC + 1us; 1uy) 
 
@@ -531,514 +554,516 @@ opcode.[0xFE] <- (fun () ->
 opcode.[0xFF] <- (fun () -> 
 
 
-CBopcode.[0x00] <- (fun () -> 
 
-CBopcode.[0x01] <- (fun () -> 
+CBopcode.[0x00] <- (fun () -> rlc(&B);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x02] <- (fun () -> 
+CBopcode.[0x01] <- (fun () -> rlc(&C);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x03] <- (fun () -> 
+CBopcode.[0x02] <- (fun () -> rlc(&D);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x04] <- (fun () -> 
+CBopcode.[0x03] <- (fun () -> rlc(&E);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x05] <- (fun () -> 
+CBopcode.[0x04] <- (fun () -> rlc(&H);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x06] <- (fun () -> 
+CBopcode.[0x05] <- (fun () -> rlc(&L);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x07] <- (fun () -> 
+CBopcode.[0x06] <- (fun () -> rlcHL();    PC <- PC + 1us; 4uy)
 
-CBopcode.[0x08] <- (fun () -> 
+CBopcode.[0x07] <- (fun () -> rlc(&A);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x09] <- (fun () -> 
+CBopcode.[0x08] <- (fun () -> rrc(&B);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x0A] <- (fun () -> 
+CBopcode.[0x09] <- (fun () -> rrc(&C);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x0B] <- (fun () -> 
+CBopcode.[0x0A] <- (fun () -> rrc(&D);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x0C] <- (fun () -> 
+CBopcode.[0x0B] <- (fun () -> rrc(&E);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x0D] <- (fun () -> 
+CBopcode.[0x0C] <- (fun () -> rrc(&H);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x0E] <- (fun () -> 
+CBopcode.[0x0D] <- (fun () -> rrc(&L);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x0F] <- (fun () -> 
+CBopcode.[0x0E] <- (fun () -> rrcHL();    PC <- PC + 1us; 4uy)
 
-CBopcode.[0x10] <- (fun () -> 
+CBopcode.[0x0F] <- (fun () -> rrc(&A);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x11] <- (fun () -> 
+CBopcode.[0x10] <- (fun () -> rl(&B);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x12] <- (fun () -> 
+CBopcode.[0x11] <- (fun () -> rl(&C);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x13] <- (fun () -> 
+CBopcode.[0x12] <- (fun () -> rl(&D);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x14] <- (fun () -> 
+CBopcode.[0x13] <- (fun () -> rl(&E);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x15] <- (fun () -> 
+CBopcode.[0x14] <- (fun () -> rl(&H);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x16] <- (fun () -> 
+CBopcode.[0x15] <- (fun () -> rl(&L);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x17] <- (fun () -> 
+CBopcode.[0x16] <- (fun () -> rlHL();     PC <- PC + 1us; 4uy)
 
-CBopcode.[0x18] <- (fun () -> 
+CBopcode.[0x17] <- (fun () -> rl(&A);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x19] <- (fun () -> 
+CBopcode.[0x18] <- (fun () -> rr(&B);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x1A] <- (fun () -> 
+CBopcode.[0x19] <- (fun () -> rr(&C);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x1B] <- (fun () -> 
+CBopcode.[0x1A] <- (fun () -> rr(&D);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x1C] <- (fun () -> 
+CBopcode.[0x1B] <- (fun () -> rr(&E);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x1D] <- (fun () -> 
+CBopcode.[0x1C] <- (fun () -> rr(&H);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x1E] <- (fun () -> 
+CBopcode.[0x1D] <- (fun () -> rr(&L);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x1F] <- (fun () -> 
+CBopcode.[0x1E] <- (fun () -> rrHL();     PC <- PC + 1us; 4uy)
 
-CBopcode.[0x20] <- (fun () -> 
+CBopcode.[0x1F] <- (fun () -> rr(&A);     PC <- PC + 1us; 2uy)
 
-CBopcode.[0x21] <- (fun () -> 
+CBopcode.[0x20] <- (fun () -> sla(&B);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x22] <- (fun () -> 
+CBopcode.[0x21] <- (fun () -> sla(&C);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x23] <- (fun () -> 
+CBopcode.[0x22] <- (fun () -> sla(&D);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x24] <- (fun () -> 
+CBopcode.[0x23] <- (fun () -> sla(&E);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x25] <- (fun () -> 
+CBopcode.[0x24] <- (fun () -> sla(&H);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x26] <- (fun () -> 
+CBopcode.[0x25] <- (fun () -> sla(&L);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x27] <- (fun () -> 
+CBopcode.[0x26] <- (fun () -> slaHL();    PC <- PC + 1us; 4uy)
 
-CBopcode.[0x28] <- (fun () -> 
+CBopcode.[0x27] <- (fun () -> sla(&A);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x29] <- (fun () -> 
+CBopcode.[0x28] <- (fun () -> sra(&B);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x2A] <- (fun () -> 
+CBopcode.[0x29] <- (fun () -> sra(&C);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x2B] <- (fun () -> 
+CBopcode.[0x2A] <- (fun () -> sra(&D);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x2C] <- (fun () -> 
+CBopcode.[0x2B] <- (fun () -> sra(&E);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x2D] <- (fun () -> 
+CBopcode.[0x2C] <- (fun () -> sra(&H);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x2E] <- (fun () -> 
+CBopcode.[0x2D] <- (fun () -> sra(&L);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x2F] <- (fun () -> 
+CBopcode.[0x2E] <- (fun () -> sraHL();    PC <- PC + 1us; 4uy)
 
-CBopcode.[0x30] <- (fun () -> 
+CBopcode.[0x2F] <- (fun () -> sra(&A);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x31] <- (fun () -> 
+CBopcode.[0x30] <- (fun () -> swap(&B);   PC <- PC + 1us; 2uy)
 
-CBopcode.[0x32] <- (fun () -> 
+CBopcode.[0x31] <- (fun () -> swap(&C);   PC <- PC + 1us; 2uy)
 
-CBopcode.[0x33] <- (fun () -> 
+CBopcode.[0x32] <- (fun () -> swap(&D);   PC <- PC + 1us; 2uy)
 
-CBopcode.[0x34] <- (fun () -> 
+CBopcode.[0x33] <- (fun () -> swap(&E);   PC <- PC + 1us; 2uy)
 
-CBopcode.[0x35] <- (fun () -> 
+CBopcode.[0x34] <- (fun () -> swap(&H);   PC <- PC + 1us; 2uy)
 
-CBopcode.[0x36] <- (fun () -> 
+CBopcode.[0x35] <- (fun () -> swap(&L);   PC <- PC + 1us; 2uy)
 
-CBopcode.[0x37] <- (fun () -> 
+CBopcode.[0x36] <- (fun () -> swapHL();   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x38] <- (fun () -> 
+CBopcode.[0x37] <- (fun () -> swap(&A);   PC <- PC + 1us; 2uy)
 
-CBopcode.[0x39] <- (fun () -> 
+CBopcode.[0x38] <- (fun () -> srl(&B);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x3A] <- (fun () -> 
+CBopcode.[0x39] <- (fun () -> srl(&C);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x3B] <- (fun () -> 
+CBopcode.[0x3A] <- (fun () -> srl(&D);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x3C] <- (fun () -> 
+CBopcode.[0x3B] <- (fun () -> srl(&E);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x3D] <- (fun () -> 
+CBopcode.[0x3C] <- (fun () -> srl(&H);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x3E] <- (fun () -> 
+CBopcode.[0x3D] <- (fun () -> srl(&L);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x3F] <- (fun () -> 
+CBopcode.[0x3E] <- (fun () -> srlHL();    PC <- PC + 1us; 4uy)
 
-CBopcode.[0x40] <- (fun () -> 
+CBopcode.[0x3F] <- (fun () -> srl(&A);    PC <- PC + 1us; 2uy)
 
-CBopcode.[0x41] <- (fun () -> 
+CBopcode.[0x40] <- (fun () -> bit(0, B);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x42] <- (fun () -> 
+CBopcode.[0x41] <- (fun () -> bit(0, C);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x43] <- (fun () -> 
+CBopcode.[0x42] <- (fun () -> bit(0, D);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x44] <- (fun () -> 
+CBopcode.[0x43] <- (fun () -> bit(0, E);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x45] <- (fun () -> 
+CBopcode.[0x44] <- (fun () -> bit(0, H);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x46] <- (fun () -> 
+CBopcode.[0x45] <- (fun () -> bit(0, L);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x47] <- (fun () -> 
+CBopcode.[0x46] <- (fun () -> bitHL(0);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x48] <- (fun () -> 
+CBopcode.[0x47] <- (fun () -> bit(0, A);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x49] <- (fun () -> 
+CBopcode.[0x48] <- (fun () -> bit(1, B);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x4A] <- (fun () -> 
+CBopcode.[0x49] <- (fun () -> bit(1, C);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x4B] <- (fun () -> 
+CBopcode.[0x4A] <- (fun () -> bit(1, D);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x4C] <- (fun () -> 
+CBopcode.[0x4B] <- (fun () -> bit(1, E);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x4D] <- (fun () -> 
+CBopcode.[0x4C] <- (fun () -> bit(1, H);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x4E] <- (fun () -> 
+CBopcode.[0x4D] <- (fun () -> bit(1, L);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x4F] <- (fun () -> 
+CBopcode.[0x4E] <- (fun () -> bitHL(1);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x50] <- (fun () -> 
+CBopcode.[0x4F] <- (fun () -> bit(1, A);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x51] <- (fun () -> 
+CBopcode.[0x50] <- (fun () -> bit(2, B);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x52] <- (fun () -> 
+CBopcode.[0x51] <- (fun () -> bit(2, C);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x53] <- (fun () -> 
+CBopcode.[0x52] <- (fun () -> bit(2, D);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x54] <- (fun () -> 
+CBopcode.[0x53] <- (fun () -> bit(2, E);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x55] <- (fun () -> 
+CBopcode.[0x54] <- (fun () -> bit(2, H);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x56] <- (fun () -> 
+CBopcode.[0x55] <- (fun () -> bit(2, L);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x57] <- (fun () -> 
+CBopcode.[0x56] <- (fun () -> bitHL(2);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x58] <- (fun () -> 
+CBopcode.[0x57] <- (fun () -> bit(2, A);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x59] <- (fun () -> 
+CBopcode.[0x58] <- (fun () -> bit(3, B);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x5A] <- (fun () -> 
+CBopcode.[0x59] <- (fun () -> bit(3, C);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x5B] <- (fun () -> 
+CBopcode.[0x5A] <- (fun () -> bit(3, D);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x5C] <- (fun () -> 
+CBopcode.[0x5B] <- (fun () -> bit(3, E);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x5D] <- (fun () -> 
+CBopcode.[0x5C] <- (fun () -> bit(3, H);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x5E] <- (fun () -> 
+CBopcode.[0x5D] <- (fun () -> bit(3, L);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x5F] <- (fun () -> 
+CBopcode.[0x5E] <- (fun () -> bitHL(3);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x60] <- (fun () -> 
+CBopcode.[0x5F] <- (fun () -> bit(3, A);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x61] <- (fun () -> 
+CBopcode.[0x60] <- (fun () -> bit(4, B);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x62] <- (fun () -> 
+CBopcode.[0x61] <- (fun () -> bit(4, C);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x63] <- (fun () -> 
+CBopcode.[0x62] <- (fun () -> bit(4, D);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x64] <- (fun () -> 
+CBopcode.[0x63] <- (fun () -> bit(4, E);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x65] <- (fun () -> 
+CBopcode.[0x64] <- (fun () -> bit(4, H);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x66] <- (fun () -> 
+CBopcode.[0x65] <- (fun () -> bit(4, L);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x67] <- (fun () -> 
+CBopcode.[0x66] <- (fun () -> bitHL(4);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x68] <- (fun () -> 
+CBopcode.[0x67] <- (fun () -> bit(4, A);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x69] <- (fun () -> 
+CBopcode.[0x68] <- (fun () -> bit(5, B);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x6A] <- (fun () -> 
+CBopcode.[0x69] <- (fun () -> bit(5, C);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x6B] <- (fun () -> 
+CBopcode.[0x6A] <- (fun () -> bit(5, D);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x6C] <- (fun () -> 
+CBopcode.[0x6B] <- (fun () -> bit(5, E);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x6D] <- (fun () -> 
+CBopcode.[0x6C] <- (fun () -> bit(5, H);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x6E] <- (fun () -> 
+CBopcode.[0x6D] <- (fun () -> bit(5, L);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x6F] <- (fun () -> 
+CBopcode.[0x6E] <- (fun () -> bitHL(5);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x70] <- (fun () -> 
+CBopcode.[0x6F] <- (fun () -> bit(5, A);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x71] <- (fun () -> 
+CBopcode.[0x70] <- (fun () -> bit(6, B);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x72] <- (fun () -> 
+CBopcode.[0x71] <- (fun () -> bit(6, C);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x73] <- (fun () -> 
+CBopcode.[0x72] <- (fun () -> bit(6, D);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x74] <- (fun () -> 
+CBopcode.[0x73] <- (fun () -> bit(6, E);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x75] <- (fun () -> 
+CBopcode.[0x74] <- (fun () -> bit(6, H);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x76] <- (fun () -> 
+CBopcode.[0x75] <- (fun () -> bit(6, L);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x77] <- (fun () -> 
+CBopcode.[0x76] <- (fun () -> bitHL(6);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x78] <- (fun () -> 
+CBopcode.[0x77] <- (fun () -> bit(6, A);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x79] <- (fun () -> 
+CBopcode.[0x78] <- (fun () -> bit(7, B);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x7A] <- (fun () -> 
+CBopcode.[0x79] <- (fun () -> bit(7, C);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x7B] <- (fun () -> 
+CBopcode.[0x7A] <- (fun () -> bit(7, D);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x7C] <- (fun () -> 
+CBopcode.[0x7B] <- (fun () -> bit(7, E);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x7D] <- (fun () -> 
+CBopcode.[0x7C] <- (fun () -> bit(7, H);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x7E] <- (fun () -> 
+CBopcode.[0x7D] <- (fun () -> bit(7, L);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x7F] <- (fun () -> 
+CBopcode.[0x7E] <- (fun () -> bitHL(7);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x80] <- (fun () -> 
+CBopcode.[0x7F] <- (fun () -> bit(7, A);  PC <- PC + 1us; 2uy)
 
-CBopcode.[0x81] <- (fun () -> 
+CBopcode.[0x80] <- (fun () -> res(0, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x82] <- (fun () -> 
+CBopcode.[0x81] <- (fun () -> res(0, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x83] <- (fun () -> 
+CBopcode.[0x82] <- (fun () -> res(0, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x84] <- (fun () -> 
+CBopcode.[0x83] <- (fun () -> res(0, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x85] <- (fun () -> 
+CBopcode.[0x84] <- (fun () -> res(0, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x86] <- (fun () -> 
+CBopcode.[0x85] <- (fun () -> res(0, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x87] <- (fun () -> 
+CBopcode.[0x86] <- (fun () -> resHL(0);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x88] <- (fun () -> 
+CBopcode.[0x87] <- (fun () -> res(0, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x89] <- (fun () -> 
+CBopcode.[0x88] <- (fun () -> res(1, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x8A] <- (fun () -> 
+CBopcode.[0x89] <- (fun () -> res(1, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x8B] <- (fun () -> 
+CBopcode.[0x8A] <- (fun () -> res(1, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x8C] <- (fun () -> 
+CBopcode.[0x8B] <- (fun () -> res(1, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x8D] <- (fun () -> 
+CBopcode.[0x8C] <- (fun () -> res(1, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x8E] <- (fun () -> 
+CBopcode.[0x8D] <- (fun () -> res(1, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x8F] <- (fun () -> 
+CBopcode.[0x8E] <- (fun () -> resHL(1);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x90] <- (fun () -> 
+CBopcode.[0x8F] <- (fun () -> res(1, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x91] <- (fun () -> 
+CBopcode.[0x90] <- (fun () -> res(2, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x92] <- (fun () -> 
+CBopcode.[0x91] <- (fun () -> res(2, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x93] <- (fun () -> 
+CBopcode.[0x92] <- (fun () -> res(2, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x94] <- (fun () -> 
+CBopcode.[0x93] <- (fun () -> res(2, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x95] <- (fun () -> 
+CBopcode.[0x94] <- (fun () -> res(2, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x96] <- (fun () -> 
+CBopcode.[0x95] <- (fun () -> res(2, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x97] <- (fun () -> 
+CBopcode.[0x96] <- (fun () -> resHL(2);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0x98] <- (fun () -> 
+CBopcode.[0x97] <- (fun () -> res(2, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x99] <- (fun () -> 
+CBopcode.[0x98] <- (fun () -> res(3, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x9A] <- (fun () -> 
+CBopcode.[0x99] <- (fun () -> res(3, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x9B] <- (fun () -> 
+CBopcode.[0x9A] <- (fun () -> res(3, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x9C] <- (fun () -> 
+CBopcode.[0x9B] <- (fun () -> res(3, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x9D] <- (fun () -> 
+CBopcode.[0x9C] <- (fun () -> res(3, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x9E] <- (fun () -> 
+CBopcode.[0x9D] <- (fun () -> res(3, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0x9F] <- (fun () -> 
+CBopcode.[0x9E] <- (fun () -> resHL(3);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xA0] <- (fun () -> 
+CBopcode.[0x9F] <- (fun () -> res(3, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xA1] <- (fun () -> 
+CBopcode.[0xA0] <- (fun () -> res(4, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xA2] <- (fun () -> 
+CBopcode.[0xA1] <- (fun () -> res(4, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xA3] <- (fun () -> 
+CBopcode.[0xA2] <- (fun () -> res(4, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xA4] <- (fun () -> 
+CBopcode.[0xA3] <- (fun () -> res(4, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xA5] <- (fun () -> 
+CBopcode.[0xA4] <- (fun () -> res(4, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xA6] <- (fun () -> 
+CBopcode.[0xA5] <- (fun () -> res(4, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xA7] <- (fun () -> 
+CBopcode.[0xA6] <- (fun () -> resHL(4);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xA8] <- (fun () -> 
+CBopcode.[0xA7] <- (fun () -> res(4, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xA9] <- (fun () -> 
+CBopcode.[0xA8] <- (fun () -> res(5, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xAA] <- (fun () -> 
+CBopcode.[0xA9] <- (fun () -> res(5, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xAB] <- (fun () -> 
+CBopcode.[0xAA] <- (fun () -> res(5, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xAC] <- (fun () -> 
+CBopcode.[0xAB] <- (fun () -> res(5, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xAD] <- (fun () -> 
+CBopcode.[0xAC] <- (fun () -> res(5, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xAE] <- (fun () -> 
+CBopcode.[0xAD] <- (fun () -> res(5, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xAF] <- (fun () -> 
+CBopcode.[0xAE] <- (fun () -> resHL(5);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xB0] <- (fun () -> 
+CBopcode.[0xAF] <- (fun () -> res(5, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xB1] <- (fun () -> 
+CBopcode.[0xB0] <- (fun () -> res(6, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xB2] <- (fun () -> 
+CBopcode.[0xB1] <- (fun () -> res(6, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xB3] <- (fun () -> 
+CBopcode.[0xB2] <- (fun () -> res(6, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xB4] <- (fun () -> 
+CBopcode.[0xB3] <- (fun () -> res(6, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xB5] <- (fun () -> 
+CBopcode.[0xB4] <- (fun () -> res(6, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xB6] <- (fun () -> 
+CBopcode.[0xB5] <- (fun () -> res(6, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xB7] <- (fun () -> 
+CBopcode.[0xB6] <- (fun () -> resHL(6);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xB8] <- (fun () -> 
+CBopcode.[0xB7] <- (fun () -> res(6, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xB9] <- (fun () -> 
+CBopcode.[0xB8] <- (fun () -> res(7, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xBA] <- (fun () -> 
+CBopcode.[0xB9] <- (fun () -> res(7, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xBB] <- (fun () -> 
+CBopcode.[0xBA] <- (fun () -> res(7, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xBC] <- (fun () -> 
+CBopcode.[0xBB] <- (fun () -> res(7, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xBD] <- (fun () -> 
+CBopcode.[0xBC] <- (fun () -> res(7, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xBE] <- (fun () -> 
+CBopcode.[0xBD] <- (fun () -> res(7, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xBF] <- (fun () -> 
+CBopcode.[0xBE] <- (fun () -> resHL(7);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xC0] <- (fun () -> 
+CBopcode.[0xBF] <- (fun () -> res(7, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xC1] <- (fun () -> 
+CBopcode.[0xC0] <- (fun () -> set(0, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xC2] <- (fun () -> 
+CBopcode.[0xC1] <- (fun () -> set(0, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xC3] <- (fun () -> 
+CBopcode.[0xC2] <- (fun () -> set(0, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xC4] <- (fun () -> 
+CBopcode.[0xC3] <- (fun () -> set(0, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xC5] <- (fun () -> 
+CBopcode.[0xC4] <- (fun () -> set(0, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xC6] <- (fun () -> 
+CBopcode.[0xC5] <- (fun () -> set(0, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xC7] <- (fun () -> 
+CBopcode.[0xC6] <- (fun () -> setHL(0);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xC8] <- (fun () -> 
+CBopcode.[0xC7] <- (fun () -> set(0, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xC9] <- (fun () -> 
+CBopcode.[0xC8] <- (fun () -> set(1, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xCA] <- (fun () -> 
+CBopcode.[0xC9] <- (fun () -> set(1, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xCB] <- (fun () -> 
+CBopcode.[0xCA] <- (fun () -> set(1, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xCC] <- (fun () -> 
+CBopcode.[0xCB] <- (fun () -> set(1, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xCD] <- (fun () -> 
+CBopcode.[0xCC] <- (fun () -> set(1, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xCE] <- (fun () -> 
+CBopcode.[0xCD] <- (fun () -> set(1, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xCF] <- (fun () -> 
+CBopcode.[0xCE] <- (fun () -> setHL(1);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xD0] <- (fun () -> 
+CBopcode.[0xCF] <- (fun () -> set(1, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xD1] <- (fun () -> 
+CBopcode.[0xD0] <- (fun () -> set(2, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xD2] <- (fun () -> 
+CBopcode.[0xD1] <- (fun () -> set(2, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xD3] <- (fun () -> 
+CBopcode.[0xD2] <- (fun () -> set(2, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xD4] <- (fun () -> 
+CBopcode.[0xD3] <- (fun () -> set(2, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xD5] <- (fun () -> 
+CBopcode.[0xD4] <- (fun () -> set(2, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xD6] <- (fun () -> 
+CBopcode.[0xD5] <- (fun () -> set(2, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xD7] <- (fun () -> 
+CBopcode.[0xD6] <- (fun () -> setHL(2);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xD8] <- (fun () -> 
+CBopcode.[0xD7] <- (fun () -> set(2, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xD9] <- (fun () -> 
+CBopcode.[0xD8] <- (fun () -> set(3, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xDA] <- (fun () -> 
+CBopcode.[0xD9] <- (fun () -> set(3, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xDB] <- (fun () -> 
+CBopcode.[0xDA] <- (fun () -> set(3, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xDC] <- (fun () -> 
+CBopcode.[0xDB] <- (fun () -> set(3, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xDD] <- (fun () -> 
+CBopcode.[0xDC] <- (fun () -> set(3, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xDE] <- (fun () -> 
+CBopcode.[0xDD] <- (fun () -> set(3, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xDF] <- (fun () -> 
+CBopcode.[0xDE] <- (fun () -> setHL(3);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xE0] <- (fun () -> 
+CBopcode.[0xDF] <- (fun () -> set(3, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xE1] <- (fun () -> 
+CBopcode.[0xE0] <- (fun () -> set(4, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xE2] <- (fun () -> 
+CBopcode.[0xE1] <- (fun () -> set(4, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xE3] <- (fun () -> 
+CBopcode.[0xE2] <- (fun () -> set(4, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xE4] <- (fun () -> 
+CBopcode.[0xE3] <- (fun () -> set(4, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xE5] <- (fun () -> 
+CBopcode.[0xE4] <- (fun () -> set(4, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xE6] <- (fun () -> 
+CBopcode.[0xE5] <- (fun () -> set(4, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xE7] <- (fun () -> 
+CBopcode.[0xE6] <- (fun () -> setHL(4);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xE8] <- (fun () -> 
+CBopcode.[0xE7] <- (fun () -> set(4, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xE9] <- (fun () -> 
+CBopcode.[0xE8] <- (fun () -> set(5, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xEA] <- (fun () -> 
+CBopcode.[0xE9] <- (fun () -> set(5, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xEB] <- (fun () -> 
+CBopcode.[0xEA] <- (fun () -> set(5, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xEC] <- (fun () -> 
+CBopcode.[0xEB] <- (fun () -> set(5, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xED] <- (fun () -> 
+CBopcode.[0xEC] <- (fun () -> set(5, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xEE] <- (fun () -> 
+CBopcode.[0xED] <- (fun () -> set(5, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xEF] <- (fun () -> 
+CBopcode.[0xEE] <- (fun () -> setHL(5);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xF0] <- (fun () -> 
+CBopcode.[0xEF] <- (fun () -> set(5, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xF1] <- (fun () -> 
+CBopcode.[0xF0] <- (fun () -> set(6, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xF2] <- (fun () -> 
+CBopcode.[0xF1] <- (fun () -> set(6, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xF3] <- (fun () -> 
+CBopcode.[0xF2] <- (fun () -> set(6, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xF4] <- (fun () -> 
+CBopcode.[0xF3] <- (fun () -> set(6, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xF5] <- (fun () -> 
+CBopcode.[0xF4] <- (fun () -> set(6, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xF6] <- (fun () -> 
+CBopcode.[0xF5] <- (fun () -> set(6, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xF7] <- (fun () -> 
+CBopcode.[0xF6] <- (fun () -> setHL(6);   PC <- PC + 1us; 4uy)
 
-CBopcode.[0xF8] <- (fun () -> 
+CBopcode.[0xF7] <- (fun () -> set(6, &A); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xF9] <- (fun () -> 
+CBopcode.[0xF8] <- (fun () -> set(7, &B); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xFA] <- (fun () -> 
+CBopcode.[0xF9] <- (fun () -> set(7, &C); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xFB] <- (fun () -> 
+CBopcode.[0xFA] <- (fun () -> set(7, &D); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xFC] <- (fun () -> 
+CBopcode.[0xFB] <- (fun () -> set(7, &E); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xFD] <- (fun () -> 
+CBopcode.[0xFC] <- (fun () -> set(7, &H); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xFE] <- (fun () -> 
+CBopcode.[0xFD] <- (fun () -> set(7, &L); PC <- PC + 1us; 2uy)
 
-CBopcode.[0xFF] <- (fun () -> 
+CBopcode.[0xFE] <- (fun () -> setHL(7);   PC <- PC + 1us; 4uy)
+
+CBopcode.[0xFF] <- (fun () -> set(7, &A); PC <- PC + 1us; 2uy)
+
