@@ -205,33 +205,14 @@ let call () =
 
 let jr () = PC <- PC + 2us + uint16 (sbyte (readAddress(PC+1us)))
 
-let push (data:uint16) =
-     SP <- SP - 2us 
-     memory.[int (SP+1us)] <- byte ((data &&& 0xFF00us) >>> 8)
-     memory.[int SP] <- byte (data &&& 0x00FFus) 
-
-let push_2 (msb:byte, lsb:byte) =
-     SP <- SP - 2us 
-     memory.[int (SP+1us)] <- msb
-     memory.[int SP] <- lsb 
-
 let daa () =
     let lowBCD = A % 10uy
     let highBCD = ((A % 100uy) - lowBCD) / 10uy
     let result = (highBCD <<< 4) ||| lowBCD
-
     ZF <- (result = 0uy)
     HF <- false
     CF <- A >= 100uy
-
     A <- result
-
-let rlc (reg:byte byref) =
-     CF <- (if reg &&& 0b10000000uy > 1uy then true else false) 
-     reg <- (reg <<< 1) ||| (if CF then 1uy else 0uy) 
-     ZF <- reg = 0uy
-     NF <- false
-     HF <- false
     
 
 let rlcHL () =
