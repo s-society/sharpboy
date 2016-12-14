@@ -3,6 +3,27 @@
 open Memory
 open Register
 
+let addHL (m:byte, l:byte) =
+    let hl = (uint16 H <<< 8 ||| uint16 L)
+    let reg = (uint16 m <<< 8 ||| uint16 l)
+    let sum = hl + reg
+    CF <- sum < hl
+    HF <- ((int hl &&& 0x0FFF)+(int reg &&& 0x0FFF)) > 0x0FFF 
+    H <- byte ((sum &&& 0xFF00us) >>> 8) 
+    L <- byte (sum &&& 0x00FFus)
+    NF <- false
+
+let addHLSP () = addHL(byte ((SP &&& 0xFF00us) >>> 8), byte (SP &&& 0x00FFus))
+
+let addSP () = 
+    let sum = SP + uint16 (sbyte (readAddress(PC+1us)))
+    CF <- (int SP + int (sbyte (readAddress(PC+1us)))) > 0xFFFF
+    //CF <- sum < SP
+    HF <- ((int SP &&& 0x0FFF)+(int (sbyte (readAddress(PC+1us))) &&& 0x0FFF)) > 0x0FFF 
+    SP <- sum
+    ZF <- false
+    NF <- false
+
 let bit (b:int, reg:byte) =
      ZF <- ((reg &&& (1uy <<< b)) = 0uy)
      NF <- false
