@@ -473,7 +473,7 @@ opcode.[0xD1] <- (fun () -> )
 
 opcode.[0xD2] <- (fun () -> )
 
-opcode.[0xD3] <- (fun () -> )
+// opcode.[0xD3] <- (fun () -> )
 
 opcode.[0xD4] <- (fun () -> )
 
@@ -489,7 +489,7 @@ opcode.[0xD9] <- (fun () -> )
 
 opcode.[0xDA] <- (fun () -> )
 
-opcode.[0xDB] <- (fun () -> )
+// opcode.[0xDB] <- (fun () -> )
 
 opcode.[0xDC] <- (fun () -> )
 
@@ -505,9 +505,9 @@ opcode.[0xE1] <- (fun () -> )
 
 opcode.[0xE2] <- (fun () -> )
 
-opcode.[0xE3] <- (fun () -> )
+// opcode.[0xE3] <- (fun () -> )
 
-opcode.[0xE4] <- (fun () -> )
+// opcode.[0xE4] <- (fun () -> )
 
 opcode.[0xE5] <- (fun () -> )
 
@@ -521,11 +521,11 @@ opcode.[0xE9] <- (fun () -> )
 
 opcode.[0xEA] <- (fun () -> )
 
-opcode.[0xEB] <- (fun () -> )
+// opcode.[0xEB] <- (fun () -> )
 
-opcode.[0xEC] <- (fun () -> )
+// opcode.[0xEC] <- (fun () -> )
 
-opcode.[0xED] <- (fun () -> )
+// opcode.[0xED] <- (fun () -> )
 
 opcode.[0xEE] <- (fun () -> xorA(readAddress(PC+1us)); PC <- PC + 2us; 2uy) 
 
@@ -539,7 +539,7 @@ opcode.[0xF2] <- (fun () -> )
 
 opcode.[0xF3] <- (fun () -> )
 
-opcode.[0xF4] <- (fun () -> )
+// opcode.[0xF4] <- (fun () -> )
 
 opcode.[0xF5] <- (fun () -> )
 
@@ -555,9 +555,9 @@ opcode.[0xFA] <- (fun () -> )
 
 opcode.[0xFB] <- (fun () -> )
 
-opcode.[0xFC] <- (fun () -> )
+// opcode.[0xFC] <- (fun () -> )
 
-opcode.[0xFD] <- (fun () -> )
+// opcode.[0xFD] <- (fun () -> )
 
 opcode.[0xFE] <- (fun () -> )
 
