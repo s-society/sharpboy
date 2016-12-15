@@ -32,10 +32,10 @@ let mutable cbOpCycles = 0uy
 let STAT_MODE_00_HBLANK,STAT_MODE_01_VBLANK,STAT_MODE_10_OAM,STAT_MODE_11_OAM_RAM = 0b00uy,0b01uy,0b10uy,0b11uy
 let STAT_MODE_00_BIT,STAT_MODE_01_BIT,STAT_MODE_10_BIT,STAT_LY_LYC_BIT = 3,4,5,6
 
-let TILE_PATTERN_TABLE_0 = 0x8000us //$8000-$8FFF
-let TILE_PATTERN_TABLE_1 = 0x8800us //$8800-$97FF
-let BG_TILE_MAP_0 = 0x9800us  //$9800-$9BFF
-let BG_TILE_MAP_1 = 0x9C00us  //$9C00-$9FFF
+let TILE_PATTERN_TABLE_0 = 0x8000us
+let TILE_PATTERN_TABLE_1 = 0x8800us
+let BG_TILE_MAP_0 = 0x9800us
+let BG_TILE_MAP_1 = 0x9C00us
 
 let mutable TILE_PATTERN_TABLE_SEL = TILE_PATTERN_TABLE_0
 let mutable BG_TILE_MAP_SEL = BG_TILE_MAP_0
@@ -47,7 +47,7 @@ let VBLANK_INT,LCD_STATUS_INT,TIMEROF_INT,P10_P13_INT = 0x0040us,0x0048us,0x0058
 let VBLANK_INT_BIT,LCD_STATUS_INT_BIT,TIMEROF_INT_BIT,P10_P13_INT_BIT = 0,1,2,4
 
 
-// default values
+// Default values
 memory.[int LCDC] <-    0x91uy ; memory.[int STAT] <- STAT_MODE_10_OAM ; memory.[int SCROLLX] <- 0x0uy
 memory.[int SCROLLY] <- 0x0uy  ; memory.[int LY] <-   0x0uy            ; memory.[int LYC] <-     0x0uy 
 memory.[int IE] <- 0x0uy    
@@ -99,28 +99,27 @@ let writeAddress (address:uint16, data:byte) =
                                                                    if address < 0xDE00us then memory.[int address + 0x2000] <- data
     | _ -> memory.[int address] <- data 
 
-// write to 16bit address obtained from 2 8bit numbers
+// Write to 16bit address obtained from 2 8bit numbers
 let writeAddress_2 (first:byte, second: byte, data:byte) =
     writeAddress((uint16 first <<< 8) ||| uint16 second, data)
 
-// split 16 bits of data in 2 8 bit addresses
+// Split 16 bits of data in 2 8 bit addresses
 let writeAddress16 (address:uint16, data:uint16) = 
     writeAddress(address, byte (data &&& 0xFF00us >>> 8))
     writeAddress(address+1us, byte (data &&& 0xFFus))
 
-// write 16bits of data to 16 bit address obtained from 2 8bit numbers
+// Write 16bits of data to 16 bit address obtained from 2 8bit numbers
 let writeAddress16_2 (addressFirst:byte, addressSecond:byte, data:uint16) = 
     writeAddress16(uint16 addressFirst <<< 8 ||| uint16 addressSecond, data)
 
-// get data and address from 2 8bit numbers
+// Get data and address from 2 8bit numbers
 let writeAddress16_2_2 (addressFirst:byte, addressSecond:byte, dataFirst:byte, dataSecond:byte) = 
     writeAddress16(uint16 addressFirst <<< 8 ||| uint16 addressSecond, uint16 dataFirst <<< 8 ||| uint16 dataSecond)
 
-// same for reading, much simpler
+// Same for reading, much simpler
 let readAddress (address:uint16) = 
     memory.[int address]
 
 let readAddress_2 (msb:byte, lsb: byte) = readAddress((uint16 msb <<< 8) ||| uint16 lsb)
 let readAddress16 (address:uint16) = uint16 (readAddress(address+1us)) <<< 8 ||| uint16 (readAddress(address))
 let readAddress16_2 (msb:byte, lsb: byte) = readAddress16(uint16 msb <<< 8 ||| uint16 lsb)
-
