@@ -329,7 +329,7 @@ let opcode = Array.create (0x100) (fun () -> 0uy)
 
 let CBopcode = Array.create (0x100) (fun () -> 0uy)
 
-opcode.[0x00] <- (fun () -> PC <- PC + 1us; 1uy) //NOP
+opcode.[0x00] <- (fun () -> PC <- PC + 1us; 1uy)
 
 opcode.[0x01] <- (fun () -> B <- readAddress(PC + 2us); C <- readAddress(PC + 1us); PC <- PC + 3us; 3uy)
 
