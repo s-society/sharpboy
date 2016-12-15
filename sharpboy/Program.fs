@@ -40,7 +40,7 @@ let main argv =
 
     let screenBuffer = Array.create (SCREEN_WIDTH*SCREEN_HEIGHT) 0
 
-    let brushes = [| new SolidBrush(Color.FromArgb(223, 253, 234)); new SolidBrush(Color.FromArgb(181, 227, 198)); new SolidBrush(Color.FromArgb(162, 206, 178));  new SolidBrush(Color.FromArgb(3, 36, 15)) |]
+    let brushes = [| new SolidBrush(Color.FromArgb(255, 255, 255)); new SolidBrush(Color.FromArgb(160, 160, 160)); new SolidBrush(Color.FromArgb(64, 64, 64));  new SolidBrush(Color.FromArgb(0, 0, 0)) |]
 
     let Draw (args:PaintEventArgs) =
         for y in [0..SCREEN_HEIGHT-1] do
