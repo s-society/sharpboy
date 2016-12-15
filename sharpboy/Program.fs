@@ -184,7 +184,7 @@ let main argv =
  
   
     form.Paint.Add(Draw)
-    form.Text <- "SharpBoy by S_Society - TETRIS"
+    form.Text <- String.Concat("SharpBoy - ", ASCIIEncoding.ASCII.GetString(memory.[0x0134..0x0142]))
     form.MaximizeBox <- false
     form.FormBorderStyle <- FormBorderStyle.FixedSingle
     Application.Run(form)
