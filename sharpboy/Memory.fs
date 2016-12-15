@@ -41,8 +41,11 @@ let mutable TILE_PATTERN_TABLE_SEL = TILE_PATTERN_TABLE_0
 let mutable BG_TILE_MAP_SEL = BG_TILE_MAP_0
 let mutable WINDOW_TILE_MAP_SEL = BG_TILE_MAP_1
 
-let mutable timerOverflow = 0
-let mutable lcdCycles = 0
+let mutable cycles, lcdCycles, timerCycles, timerOverflow, divCycles = 0uy, 0, 0, 0, 0
+
+let VBLANK_INT,LCD_STATUS_INT,TIMEROF_INT,P10_P13_INT = 0x0040us,0x0048us,0x0058us,0x0060us
+let VBLANK_INT_BIT,LCD_STATUS_INT_BIT,TIMEROF_INT_BIT,P10_P13_INT_BIT = 0,1,2,4
+
 
 // default values
 memory.[int LCDC] <-    0x91uy ; memory.[int STAT] <- STAT_MODE_10_OAM ; memory.[int SCROLLX] <- 0x0uy

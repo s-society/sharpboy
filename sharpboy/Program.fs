@@ -5,14 +5,32 @@ open System.IO
 open System.Text
 open System.Drawing
 open Memory
+open Register
 open Cpu
 
 type DoubleBufferForm() =
     inherit Form()
     do base.SetStyle(ControlStyles.AllPaintingInWmPaint ||| ControlStyles.UserPaint ||| ControlStyles.DoubleBuffer, true)
 
-[<EntryPoint>]
+[<EntryPoint>][<STAThread>]
 let main argv = 
+
+    memory.[int LCDC] <-    0x91uy ; memory.[int STAT] <- STAT_MODE_10_OAM ; memory.[int SCROLLX] <- 0x0uy
+    memory.[int SCROLLY] <- 0x0uy  ; memory.[int LY] <-   0x0uy            ; memory.[int LYC] <-     0x0uy 
+    memory.[int IE] <- 0x0uy  
+
+    let mutable rom = [|0uy|]
+    let openRomDialog = new OpenFileDialog()
+    openRomDialog.Title <- "Select Game Boy ROM" 
+    openRomDialog.Filter <- "Gameboy ROM Files|*.gb|All files|*.*"
+    if openRomDialog.ShowDialog() = DialogResult.OK then
+        rom <- File.ReadAllBytes(openRomDialog.FileName)
+    else Environment.Exit(1)
+
+    if rom.Length > int (snd ROM1+1us) then
+        rom.[0..int (snd ROM1)].CopyTo(memory,0)
+    else
+        rom.CopyTo(memory,0)
 
     let form = new DoubleBufferForm()
 
@@ -31,10 +49,117 @@ let main argv =
 
     let SetInterrupt (bit:int) = memory.[int IF] <- memory.[int IF] ||| (1uy <<< bit)
 
-    let P10_P13_INT_BIT = 4
+    let JumpToInterrupt (address:uint16, bit:int) = 
+        if ((memory.[int IF] &&& (1uy <<< bit)) >= 1uy) && ((memory.[int IE] &&& (1uy <<< bit)) >= 1uy) then
+            IME <- false ; lcdCycles <- lcdCycles + 32; memory.[int IF] <- memory.[int IF] &&& ~~~(1uy <<< bit); 
+            push(PC) ; PC <- address ; true 
+        else false
+
+    let SetInterrupt (bit:int) = memory.[int IF] <- memory.[int IF] ||| (1uy <<< bit)
+    let SetStatusInterruptIfModeBitSelected (bit:int) = if (memory.[int STAT] &&& (1uy <<< bit)) >= 1uy then SetInterrupt(LCD_STATUS_INT_BIT)
+    let SetStatMode (mode:byte) = 
+        if memory.[int STAT] <> ((memory.[int STAT] &&& 0xFCuy) ||| mode) then  
+            memory.[int STAT] <- (memory.[int STAT] &&& 0xFCuy) ||| mode ; true
+        else false 
+
+    let incrementLY () =
+        if memory.[int LYC] = memory.[int LY] then
+            SetStatusInterruptIfModeBitSelected(STAT_LY_LYC_BIT) 
+            memory.[int STAT] <- memory.[int STAT] ||| 0b100uy 
+        else 
+            memory.[int STAT] <- memory.[int STAT] &&& ~~~(0b100uy)
+        memory.[int LY] <- memory.[int LY] + 1uy
+        if memory.[int LY] = 154uy then 
+            memory.[int LY] <- 0uy
+
+    let Loop  =
+        async {
+        while true do
+            if not stopped then
+
+                cycles <- opcode.[int (readAddress(PC))]() * 4uy
+                if cycles = 0uy then do
+                    ignore(MessageBox.Show(String.Format("Invalid Opcode {2}{0:X2} at 0x{1:X4}", readAddress(PC), (if unhandledCBOpcode then PC-1us else PC), if unhandledCBOpcode then "CB " else String.Empty))); 
+                    Environment.Exit(1)
+            
+                lcdCycles <- lcdCycles + int cycles
+
+                if IME then
+                    if not (JumpToInterrupt(P10_P13_INT, P10_P13_INT_BIT)) then
+                        if not (JumpToInterrupt(TIMEROF_INT, TIMEROF_INT_BIT)) then
+                            if not (JumpToInterrupt(LCD_STATUS_INT, LCD_STATUS_INT_BIT)) then
+                                ignore(JumpToInterrupt(VBLANK_INT, VBLANK_INT_BIT))
+
+
+                if memory.[int LY] < 144uy then
+                    if lcdCycles >= (80+172) then
+                        if SetStatMode(STAT_MODE_00_HBLANK) then SetStatusInterruptIfModeBitSelected(STAT_MODE_00_BIT)
+                    else if lcdCycles >= 80 then
+                        ignore(SetStatMode(STAT_MODE_11_OAM_RAM))
+
+            
+                if lcdCycles >= (80+172+204) then  //456
+                    lcdCycles <- lcdCycles - 456
+                    let y = int memory.[int LY]
+                    if y < 144 then  //HBLANK --(LY < 144)--> OAM   
+                        if y < 143 then
+                            ignore(SetStatMode(STAT_MODE_10_OAM))
+                            SetStatusInterruptIfModeBitSelected(STAT_MODE_10_BIT)   
+                        for x in [0..SCREEN_WIDTH-1] do 
+                            let tileOffset = (uint16 ((x + int (memory.[int SCROLLX]))/8) + uint16 (32*((y+int (memory.[int SCROLLY]))/8))) % 0x400us
+                            let tilePixelX = uint16 ((x+int (memory.[int SCROLLX]))%8)
+                            let tilePixelY = uint16 ((y+int (memory.[int SCROLLY]))%8)
+                            let tileIndex = readAddress(BG_TILE_MAP_SEL + tileOffset)
+                            let address = TILE_PATTERN_TABLE_SEL + uint16 (if TILE_PATTERN_TABLE_SEL = TILE_PATTERN_TABLE_1 then (0x800s + ((int16 (sbyte tileIndex)) * 16s)) else (int16 tileIndex*16s)) + (tilePixelY*2us)
+                            screenBuffer.[(y*SCREEN_WIDTH) + x] <- (if readAddress(address) &&& (0b10000000uy >>> int tilePixelX) > 0uy then 1 else 0) ||| (if readAddress(address+1us) &&& (0b10000000uy >>> int tilePixelX) > 0uy then 0b10 else 0)
+                    
+                        for sprite in [(int (fst OAM))..4..(int (snd OAM))] do
+                            let spx,spy,pattern,flipx,flipy = int memory.[sprite+1], int memory.[sprite], int memory.[sprite+2], int (if (memory.[sprite+3] &&& (1uy <<< 5)) > 0uy then 1uy else 0uy), int (if (memory.[sprite+3] &&& (1uy <<< 6)) > 0uy then 1uy else 0uy) 
+                            if spx > 0 && spy > 0 && y >= (spy-16) && y < (spy-16+8) then
+                                for tilePixelX in [0..7] do
+                                    let ftilePixelX = if flipx = 1 then 7-tilePixelX else tilePixelX
+                                    let address = TILE_PATTERN_TABLE_0 + uint16 ((pattern*16) + ((if flipy = 1 then (7-(y-(spy-16))) else y-(spy-16))*2))
+                                    let color = (if readAddress(address) &&& (0b10000000uy >>> ftilePixelX) > 0uy then 1 else 0) ||| (if readAddress(address+1us) &&& (0b10000000uy >>> ftilePixelX) > 0uy then 0b10 else 0)
+                                    if color > 0 then screenBuffer.[(y*SCREEN_WIDTH) + spx - 8 + tilePixelX] <- color
+                                     
+                    incrementLY() //LY can go from 0 to 153 
+
+                    // VBLANK (144 -> 154). VBlank lasts 4560 clks (456 * (154 - 144))
+                    if memory.[int LY] = 144uy then //HBLANK --(LY = 144)--> VBLANK
+                        ignore(SetStatMode(STAT_MODE_01_VBLANK))
+                        SetStatusInterruptIfModeBitSelected(STAT_MODE_01_BIT)   
+                        SetInterrupt(VBLANK_INT_BIT)
+                    
+                        // LCD ON
+                        if (memory.[int LCDC] &&& 0b10000000uy) > 1uy then 
+                             //BG ON
+                            if (memory.[int LCDC] &&& 1uy) = 1uy then
+                                form.Invalidate() 
+
+                    if memory.[int LY] = 0uy then
+                        ignore(SetStatMode(STAT_MODE_10_OAM))
+                        SetStatusInterruptIfModeBitSelected(STAT_MODE_10_BIT) 
+
+                //TAC TIMER
+                if memory.[int TAC] &&& (1uy <<< TAC_TIMER_STOP_BIT) > 1uy then 
+                    timerCycles <- timerCycles + int cycles
+                    if timerCycles >= timerOverflow then
+                        timerCycles <- timerCycles - timerOverflow
+                        memory.[int TIMA] <- memory.[int TIMA] + 1uy;
+                        if memory.[int TIMA] = 0uy then
+                            memory.[int TIMA] <- memory.[int TMA]
+                            SetInterrupt(TIMEROF_INT_BIT)
+
+                //DIV
+                divCycles <- divCycles + int cycles
+                if divCycles > 256 then
+                    divCycles <- divCycles - 256
+                    memory.[int DIV] <- memory.[int DIV] + 1uy
+        }
+
 
     form.ClientSize <- new System.Drawing.Size(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE)
-    form.Load.Add(fun e -> form.BackColor <- Color.Black)//<-Async.Start(Loop) ?
+    form.Load.Add(fun e -> form.BackColor <- Color.Black ; Async.Start(Loop))
     form.KeyDown.Add(fun e -> match e.KeyCode with
                             | Keys.Right -> SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0001uy //right
                             | Keys.Left ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0010uy //left
@@ -59,8 +184,7 @@ let main argv =
  
   
     form.Paint.Add(Draw)
-    //form.Closed.Add(fun e -> fpsBrush.Dispose() ; Array.ForEach(brushes,(fun e -> e.Dispose()))) 
-    form.Text <- "SharpBoy by S_Society"
+    form.Text <- "SharpBoy by S_Society - TETRIS"
     form.MaximizeBox <- false
     form.FormBorderStyle <- FormBorderStyle.FixedSingle
     Application.Run(form)
