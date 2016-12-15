@@ -551,7 +551,7 @@ opcode.[0x6D] <- (fun () -> L <- L; PC <- PC + 1us; 1uy)
 
 opcode.[0x6E] <- (fun () -> L <- readAddress_2(H, L); PC <- PC + 1us; 2uy)
 
-opcode.[0x6F] <- (fun () -> L <- B; PC <- PC + 1us; 1uy)
+opcode.[0x6F] <- (fun () -> L <- A; PC <- PC + 1us; 1uy)
 
 opcode.[0x70] <- (fun () -> writeAddress_2(H, L, B); PC <- PC + 1us; 2uy)
 
