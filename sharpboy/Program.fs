@@ -45,7 +45,7 @@ let main argv =
     let Draw (args:PaintEventArgs) =
         for y in [0..SCREEN_HEIGHT-1] do
             for x in [0..SCREEN_WIDTH-1] do
-                args.Graphics.FillRectangle(brushes.[screenBuffer.[(y*SCREEN_WIDTH) + x]], x * SCALE, y * SCALE, SCALE, SCALE) // problème de type
+                args.Graphics.FillRectangle(brushes.[screenBuffer.[(y*SCREEN_WIDTH) + x]], x * SCALE, y * SCALE, SCALE, SCALE)
 
     let SetInterrupt (bit:int) = memory.[int IF] <- memory.[int IF] ||| (1uy <<< bit)
 
@@ -98,10 +98,10 @@ let main argv =
                         ignore(SetStatMode(STAT_MODE_11_OAM_RAM))
 
             
-                if lcdCycles >= (80+172+204) then  //456
+                if lcdCycles >= (80+172+204) then
                     lcdCycles <- lcdCycles - 456
                     let y = int memory.[int LY]
-                    if y < 144 then  //HBLANK --(LY < 144)--> OAM   
+                    if y < 144 then
                         if y < 143 then
                             ignore(SetStatMode(STAT_MODE_10_OAM))
                             SetStatusInterruptIfModeBitSelected(STAT_MODE_10_BIT)   
@@ -122,17 +122,15 @@ let main argv =
                                     let color = (if readAddress(address) &&& (0b10000000uy >>> ftilePixelX) > 0uy then 1 else 0) ||| (if readAddress(address+1us) &&& (0b10000000uy >>> ftilePixelX) > 0uy then 0b10 else 0)
                                     if color > 0 then screenBuffer.[(y*SCREEN_WIDTH) + spx - 8 + tilePixelX] <- color
                                      
-                    incrementLY() //LY can go from 0 to 153 
+                    incrementLY()
 
-                    // VBLANK (144 -> 154). VBlank lasts 4560 clks (456 * (154 - 144))
-                    if memory.[int LY] = 144uy then //HBLANK --(LY = 144)--> VBLANK
+                    if memory.[int LY] = 144uy then 
                         ignore(SetStatMode(STAT_MODE_01_VBLANK))
                         SetStatusInterruptIfModeBitSelected(STAT_MODE_01_BIT)   
                         SetInterrupt(VBLANK_INT_BIT)
-                    
-                        // LCD ON
+
                         if (memory.[int LCDC] &&& 0b10000000uy) > 1uy then 
-                             //BG ON
+
                             if (memory.[int LCDC] &&& 1uy) = 1uy then
                                 form.Invalidate() 
 
@@ -140,7 +138,6 @@ let main argv =
                         ignore(SetStatMode(STAT_MODE_10_OAM))
                         SetStatusInterruptIfModeBitSelected(STAT_MODE_10_BIT) 
 
-                //TAC TIMER
                 if memory.[int TAC] &&& (1uy <<< TAC_TIMER_STOP_BIT) > 1uy then 
                     timerCycles <- timerCycles + int cycles
                     if timerCycles >= timerOverflow then
@@ -150,7 +147,6 @@ let main argv =
                             memory.[int TIMA] <- memory.[int TMA]
                             SetInterrupt(TIMEROF_INT_BIT)
 
-                //DIV
                 divCycles <- divCycles + int cycles
                 if divCycles > 256 then
                     divCycles <- divCycles - 256
@@ -161,25 +157,26 @@ let main argv =
     form.ClientSize <- new System.Drawing.Size(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE)
     form.Load.Add(fun e -> form.BackColor <- Color.Black ; Async.Start(Loop))
     form.KeyDown.Add(fun e -> match e.KeyCode with
-                            | Keys.Right -> SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0001uy //right
-                            | Keys.Left ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0010uy //left
-                            | Keys.Up ->    SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0100uy //up
-                            | Keys.Down ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b1000uy //down
-                            | Keys.Z ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0001uy //A
-                            | Keys.X ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0010uy //B
-                            | Keys.Space -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0100uy //SELECT
-                            | Keys.Enter -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b1000uy //START
+                            | Keys.Right -> SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0001uy
+                            | Keys.Left ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0010uy
+                            | Keys.Up ->    SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0100uy
+                            | Keys.Down ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b1000uy
+                            | Keys.Z ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0001uy
+                            | Keys.X ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0010uy
+                            | Keys.Space -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0100uy
+                            | Keys.Enter -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b1000uy
                             | _ -> ())
+                            
     form.KeyUp.Add(fun e -> stopped <- false
                             match e.KeyCode with
-                            | Keys.Right -> SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b0001uy //right
-                            | Keys.Left ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b0010uy //left
-                            | Keys.Up ->    SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b0100uy //up
-                            | Keys.Down ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b1000uy //down
-                            | Keys.Z ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0001uy //A
-                            | Keys.X ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0010uy //B
-                            | Keys.Space -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0100uy //SELECT
-                            | Keys.Enter -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b1000uy //START
+                            | Keys.Right -> SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b0001uy
+                            | Keys.Left ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b0010uy
+                            | Keys.Up ->    SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b0100uy
+                            | Keys.Down ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b1000uy
+                            | Keys.Z ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0001uy
+                            | Keys.X ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0010uy
+                            | Keys.Space -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0100uy
+                            | Keys.Enter -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b1000uy
                             | _ -> ())
  
   
