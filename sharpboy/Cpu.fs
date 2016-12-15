@@ -539,15 +539,15 @@ opcode.[0x67] <- (fun () -> H <- A; PC <- PC + 1us; 1uy)
 
 opcode.[0x68] <- (fun () -> L <- B; PC <- PC + 1us; 1uy)
 
-opcode.[0x69] <- (fun () -> L <- B; PC <- PC + 1us; 1uy)
+opcode.[0x69] <- (fun () -> L <- C; PC <- PC + 1us; 1uy)
 
-opcode.[0x6A] <- (fun () -> L <- B; PC <- PC + 1us; 1uy)
+opcode.[0x6A] <- (fun () -> L <- D; PC <- PC + 1us; 1uy)
 
-opcode.[0x6B] <- (fun () -> L <- B; PC <- PC + 1us; 1uy)
+opcode.[0x6B] <- (fun () -> L <- E; PC <- PC + 1us; 1uy)
 
-opcode.[0x6C] <- (fun () -> L <- B; PC <- PC + 1us; 1uy)
+opcode.[0x6C] <- (fun () -> L <- H; PC <- PC + 1us; 1uy)
 
-opcode.[0x6D] <- (fun () -> L <- B; PC <- PC + 1us; 1uy)
+opcode.[0x6D] <- (fun () -> L <- L; PC <- PC + 1us; 1uy)
 
 opcode.[0x6E] <- (fun () -> L <- readAddress_2(H, L); PC <- PC + 1us; 2uy)
 
