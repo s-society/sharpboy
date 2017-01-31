@@ -13,17 +13,16 @@ type DoubleBufferForm() =
     do base.SetStyle(ControlStyles.AllPaintingInWmPaint ||| ControlStyles.UserPaint ||| ControlStyles.DoubleBuffer, true)
 
 type Cartridge = | RomOnly = 0uy
-                     | Mbc1 = 1uy | Mbc1Ram = 2uy | Mbc1RamBatt = 3uy
-                     | Mbc2 = 5uy | RomMbc2Batt = 6uy
-                     | RomRam = 0x8uy | RomRamBatt = 0x9uy
-                     | RomMbc3TimerBatt = 0xFuy | RomMbc3TimerRamBatt = 0x10uy | RomMbc3 = 0x11uy
-                     | RomMbc3Ram = 0x12uy | RomMbc3RamBatt = 0x13uy
+                 | Mbc1 = 1uy | Mbc1Ram = 2uy | Mbc1RamBatt = 3uy
+                 | Mbc2 = 5uy | Mbc2Batt = 6uy
+                 | RomRam = 0x8uy | RomRamBatt = 0x9uy
+                 | Mbc3TimerBatt = 0xFuy | Mbc3TimerRamBatt = 0x10uy | Mbc3 = 0x11uy
+                 | Mbc3Ram = 0x12uy | Mbc3RamBatt = 0x13uy
 
 type Mbc = | RomOnly = 0
            | Mbc1 = 1 
            | Mbc2 = 2 
            | Mbc3 = 3 
-           | Mbc5 = 5
 
 [<EntryPoint>][<STAThread>]
 let main argv = 
@@ -44,6 +43,14 @@ let main argv =
         rom.[0..int (snd ROM1)].CopyTo(memory,0)
     else
         rom.CopyTo(memory,0)
+
+    let cartridge = LanguagePrimitives.EnumOfValue<byte, Cartridge>(memory.[0x0147])
+
+    let mbcType = match cartridge with
+                  | Cartridge.Mbc1 | Cartridge.Mbc1Ram | Cartridge.Mbc1RamBatt -> Mbc.Mbc1
+                  | Cartridge.Mbc2 | Cartridge.Mbc2Batt -> Mbc.Mbc2
+                  | Cartridge.Mbc3 | Cartridge.Mbc3Ram | Cartridge.Mbc3RamBatt | Cartridge.Mbc3TimerBatt | Cartridge.Mbc3TimerRamBatt -> Mbc.Mbc3
+                  | _ -> Mbc.RomOnly
 
     let form = new DoubleBufferForm()
 
