@@ -12,6 +12,19 @@ type DoubleBufferForm() =
     inherit Form()
     do base.SetStyle(ControlStyles.AllPaintingInWmPaint ||| ControlStyles.UserPaint ||| ControlStyles.DoubleBuffer, true)
 
+type Cartridge = | RomOnly = 0uy
+                     | Mbc1 = 1uy | Mbc1Ram = 2uy | Mbc1RamBatt = 3uy
+                     | Mbc2 = 5uy | RomMbc2Batt = 6uy
+                     | RomRam = 0x8uy | RomRamBatt = 0x9uy
+                     | RomMbc3TimerBatt = 0xFuy | RomMbc3TimerRamBatt = 0x10uy | RomMbc3 = 0x11uy
+                     | RomMbc3Ram = 0x12uy | RomMbc3RamBatt = 0x13uy
+
+type Mbc = | RomOnly = 0
+           | Mbc1 = 1 
+           | Mbc2 = 2 
+           | Mbc3 = 3 
+           | Mbc5 = 5
+
 [<EntryPoint>][<STAThread>]
 let main argv = 
 
