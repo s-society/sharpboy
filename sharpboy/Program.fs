@@ -173,7 +173,7 @@ let main argv =
                             | Keys.Left ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0010uy
                             | Keys.Up ->    SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b0100uy
                             | Keys.Down ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 &&& ~~~0b1000uy
-                            | Keys.Z ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0001uy
+                            | Keys.W ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0001uy
                             | Keys.X ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0010uy
                             | Keys.Space -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b0100uy
                             | Keys.Enter -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 &&& ~~~0b1000uy
@@ -185,7 +185,7 @@ let main argv =
                             | Keys.Left ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b0010uy
                             | Keys.Up ->    SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b0100uy
                             | Keys.Down ->  SetInterrupt(P10_P13_INT_BIT) ; P14 <- P14 ||| 0b1000uy
-                            | Keys.Z ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0001uy
+                            | Keys.W ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0001uy
                             | Keys.X ->     SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0010uy
                             | Keys.Space -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b0100uy
                             | Keys.Enter -> SetInterrupt(P10_P13_INT_BIT) ; P15 <- P15 ||| 0b1000uy
