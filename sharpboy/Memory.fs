@@ -192,7 +192,14 @@ let writeAddress16_2_2 (addressFirst:byte, addressSecond:byte, dataFirst:byte, d
 
 // Same for reading, much simpler
 let readAddress (address:uint16) = 
-    memory.[int address]
+    if mbcType = Mbc.RomOnly then 
+        memory.[int address] 
+    else
+        match address with
+        | address when address <= (snd ROM0) -> memory.[int address] 
+        | address when address >= (fst ROM1) && address <= (snd ROM1) -> rom.[int romBankOffset + (int address &&& int 0x3FFF)] 
+        | address when address >= (fst SWRAMBANK) && address <= (snd SWRAMBANK) -> rom.[int ramBankOffset + (int address &&& int 0x1FFF)] 
+        | _ -> memory.[int address] 
 
 let readAddress_2 (msb:byte, lsb: byte) = readAddress((uint16 msb <<< 8) ||| uint16 lsb)
 let readAddress16 (address:uint16) = uint16 (readAddress(address+1us)) <<< 8 ||| uint16 (readAddress(address))
