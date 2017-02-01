@@ -14,4 +14,6 @@ of our project.
 This release also marks the end of our second semester at EPITA, during which
 we worked on this project. We will be evaluated based on this release.
 
-You can [download the 0.2 release here.](https://github.com/s-society/sharpboy/releases/tag/v0.2)
+Edit: A new 0.2.1 release with a minor fix for Azerty keyboards is now available
+
+You can [download the 0.2.1 release here.](https://github.com/s-society/sharpboy/releases/tag/v0.2.1)
