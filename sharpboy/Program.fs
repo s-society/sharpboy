@@ -12,18 +12,6 @@ type DoubleBufferForm() =
     inherit Form()
     do base.SetStyle(ControlStyles.AllPaintingInWmPaint ||| ControlStyles.UserPaint ||| ControlStyles.DoubleBuffer, true)
 
-type Cartridge = | RomOnly = 0uy
-                 | Mbc1 = 1uy | Mbc1Ram = 2uy | Mbc1RamBatt = 3uy
-                 | Mbc2 = 5uy | Mbc2Batt = 6uy
-                 | RomRam = 0x8uy | RomRamBatt = 0x9uy
-                 | Mbc3TimerBatt = 0xFuy | Mbc3TimerRamBatt = 0x10uy | Mbc3 = 0x11uy
-                 | Mbc3Ram = 0x12uy | Mbc3RamBatt = 0x13uy
-
-type Mbc = | RomOnly = 0
-           | Mbc1 = 1 
-           | Mbc2 = 2 
-           | Mbc3 = 3 
-
 [<EntryPoint>][<STAThread>]
 let main argv = 
 
@@ -44,13 +32,18 @@ let main argv =
     else
         rom.CopyTo(memory,0)
 
-    let cartridge = LanguagePrimitives.EnumOfValue<byte, Cartridge>(memory.[0x0147])
-
+    //Reading bytes to know MBC type and cartridge options
+    Memory.cartridge <- LanguagePrimitives.EnumOfValue<byte, Memory.Cartridge>(memory.[0x0147])
+    
     let mbcType = match cartridge with
-                  | Cartridge.Mbc1 | Cartridge.Mbc1Ram | Cartridge.Mbc1RamBatt -> Mbc.Mbc1
-                  | Cartridge.Mbc2 | Cartridge.Mbc2Batt -> Mbc.Mbc2
-                  | Cartridge.Mbc3 | Cartridge.Mbc3Ram | Cartridge.Mbc3RamBatt | Cartridge.Mbc3TimerBatt | Cartridge.Mbc3TimerRamBatt -> Mbc.Mbc3
-                  | _ -> Mbc.RomOnly
+                | Memory.Cartridge.Mbc1 | Memory.Cartridge.Mbc1Ram | Memory.Cartridge.Mbc1RamBatt -> Mbc.Mbc1
+                | Memory.Cartridge.Mbc2 | Memory.Cartridge.Mbc2Batt -> Mbc.Mbc2
+                | Memory.Cartridge.Mbc3 | Memory.Cartridge.Mbc3Ram | Memory.Cartridge.Mbc3RamBatt | Memory.Cartridge.Mbc3TimerBatt | Memory.Cartridge.Mbc3TimerRamBatt -> Mbc.Mbc3
+                | _ -> Mbc.RomOnly
+
+    let hasExternalRam = match cartridge with
+                     | Memory.Cartridge.Mbc1Ram | Memory.Cartridge.Mbc1RamBatt | Memory.Cartridge.RomRam | Memory.Cartridge.RomRamBatt | Memory.Cartridge.Mbc3TimerRamBatt | Memory.Cartridge.Mbc3Ram | Memory.Cartridge.Mbc3RamBatt -> true
+                     | _ -> false
 
     let form = new DoubleBufferForm()
 
