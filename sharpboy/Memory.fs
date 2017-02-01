@@ -58,7 +58,6 @@ type Cartridge = | RomOnly = 0uy
 
 let mutable cartridge = Cartridge.RomOnly
 
-
 let mutable externalRamEnabled = false
 
 type Mbc = | RomOnly = 0
@@ -131,8 +130,6 @@ let  writeAddress (address:uint16, data:byte) =
                                                      rom.[int address + int ramBankOffset] <- data
                                                   if not hasExternalRam then 
                                                      memory.[int address] <- data
-                                                  //if hasExternalRam && hasBattery then //TODO:
-                                                     //File.WriteAllBytes("test.sav", rom.[int (fst SWRAMBANK)..(int (snd SWRAMBANK)])
                                                
     | address when address = P1 -> match ((data &&& 0b110000uy) >>> 4) with //bits 4 (P14 out port) & 5 (P15 out port)
                                    | 0b00uy -> memory.[int address] <- P14 &&& P15
@@ -155,14 +152,13 @@ let  writeAddress (address:uint16, data:byte) =
                                         memory.[int oamAddress] <- memory.[int dmaAddress]
                                         dmaAddress <- dmaAddress+1us
     | address when address = DIV -> memory.[int address] <- 0uy
-    | address when address = BGP -> memory.[int address] <- data //TODO: BGP
-    | address when address = OBP0 -> memory.[int address] <- data //TODO: OBP0
-    | address when address = OBP1 -> memory.[int address] <- data //TODO: OBP1
+    | address when address = BGP -> memory.[int address] <- data
+    | address when address = OBP0 -> memory.[int address] <- data
+    | address when address = OBP1 -> memory.[int address] <- data
     | address when address = LCDC -> if (data >>> 7) <> (memory.[int address] >>> 7) then
                                         lcdCycles <- 0
                                         memory.[int LY] <- 0uy
-                                        //if memory.[int LYC] = memory.[int LY] then memory.[int STAT] <- memory.[int STAT] ||| 0b100uy else memory.[int STAT] <- memory.[int STAT] &&& ~~~(0b100uy)
-                                        //memory.[int STAT] <- (memory.[int STAT] &&& 0xFCuy) ||| 0b10uy //->OAM
+
                                      memory.[int address] <- data
                                      BG_TILE_MAP_SEL <- if data &&& (1uy <<< 3) = 0uy then BG_TILE_MAP_0 else BG_TILE_MAP_1 
                                      TILE_PATTERN_TABLE_SEL <- if data &&& (1uy <<< 4) > 0uy then TILE_PATTERN_TABLE_0 else TILE_PATTERN_TABLE_1 
