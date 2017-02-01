@@ -66,6 +66,8 @@ type Mbc = | RomOnly = 0
 
 let mutable mbcType = Mbc.RomOnly
 
+let mutable mbc1RamMode = false
+
 //ROM banks for MBC
 let mutable romBank, romBankOffset = 0,0x4000
 let mutable ramBank, ramBankOffset = 0,0
@@ -89,16 +91,16 @@ let  writeAddress (address:uint16, data:byte) =
                                                 //0000 - 1FFF Enable external RAM (if XXXX1010 (0x0A))
                                                 | address when address <= 0x1FFFus -> externalRamEnabled <- (data &&& 0x0Fuy) = 0x0Auy
                                                 //2000 - 3FFF Switch ROM Banks (MBC1: XXXBBBBB (0x1F), MBC3: XBBBBBBB (0x7F) )
-                                                | address when address >= 0x2000us && address <= 0x3FFFus ->  if mbcType = Mbc.Mbc1 then
-                                                                                                                  romBank <- romBank &&& 0x60
-                                                                                                                  swap <- int (data &&& 0x1Fuy) 
-                                                                                                                  if swap = 0 then swap <- 1  else ()
-                                                                                                                  romBank <- romBank ||| swap
-                                                                                                                  romBankOffset <- romBank * 0x4000
-                                                                                                              else 
-                                                                                                                  romBank <- int (data)  
-                                                                                                                  if romBank = 0 then romBank <- 1  else ()
-                                                                                                                  romBankOffset <- romBank * 0x4000                                                                                                                               
+                                                | address when address >= 0x2000us && address <= 0x3FFFus -> match mbcType with
+                                                                                                             | Mbc.Mbc1 -> romBank <- romBank &&& 0x60
+                                                                                                                           swap <- int (data &&& 0x1Fuy) 
+                                                                                                                           if swap = 0 then swap <- 1
+                                                                                                                           romBank <- romBank ||| swap
+                                                                                                                           romBankOffset <- romBank * 0x4000
+
+                                                                                                             | _ -> romBank <- int (data)  
+                                                                                                                    if romBank = 0 then romBank <- 1
+                                                                                                                    romBankOffset <- romBank * 0x4000                                                                                                                               
                                                 //4000 - 5FFF Switch ROM Bank set / RAM Bank (MBC1)
                                                 | address when address >= 0x4000us && address <= 0x5FFFus -> if mbcType = Mbc.Mbc1 then
                                                                                                                  if mbc1RamMode then 
@@ -117,9 +119,9 @@ let  writeAddress (address:uint16, data:byte) =
                                                                                                                     ramBank <- swap
                                                                                                                     mbc1RamMode <- false                                                                                                                                                                        //romBankOffset <- uint16 (data) * 0x4000us     
                                                 //6000 - 7FFF ROM(0) or RAM(1) Mode (MBC1), 
-                                                | address when address >= 0x6000us && address <= 0x7FFFus -> if mbcType = MbcType.Mbc1 then 
+                                                | address when address >= 0x6000us && address <= 0x7FFFus -> if mbcType = Mbc.Mbc1 then 
                                                                                                                 mbc1RamMode <- if (data &&& 1uy) = 1uy then true else false
-                                                                                                             else MessageBox.Show("TODO") ; () 
+                                                                                                             else () 
                
     //Writing to SWRAMBANK
     | address when address >= (fst SWRAMBANK) && 
