@@ -19,7 +19,6 @@ let main argv =
     memory.[int SCROLLY] <- 0x0uy  ; memory.[int LY] <-   0x0uy            ; memory.[int LYC] <-     0x0uy 
     memory.[int IE] <- 0x0uy  
 
-    let mutable rom = [|0uy|]
     let openRomDialog = new OpenFileDialog()
     openRomDialog.Title <- "Select Game Boy ROM" 
     openRomDialog.Filter <- "Gameboy ROM Files|*.gb|All files|*.*"
@@ -35,11 +34,11 @@ let main argv =
     //Reading bytes to know MBC type and cartridge options
     Memory.cartridge <- LanguagePrimitives.EnumOfValue<byte, Memory.Cartridge>(memory.[0x0147])
     
-    let mbcType = match cartridge with
-                | Memory.Cartridge.Mbc1 | Memory.Cartridge.Mbc1Ram | Memory.Cartridge.Mbc1RamBatt -> Mbc.Mbc1
-                | Memory.Cartridge.Mbc2 | Memory.Cartridge.Mbc2Batt -> Mbc.Mbc2
-                | Memory.Cartridge.Mbc3 | Memory.Cartridge.Mbc3Ram | Memory.Cartridge.Mbc3RamBatt | Memory.Cartridge.Mbc3TimerBatt | Memory.Cartridge.Mbc3TimerRamBatt -> Mbc.Mbc3
-                | _ -> Mbc.RomOnly
+    Memory.mbcType <- match cartridge with
+                      | Memory.Cartridge.Mbc1 | Memory.Cartridge.Mbc1Ram | Memory.Cartridge.Mbc1RamBatt -> Memory.Mbc.Mbc1
+                      | Memory.Cartridge.Mbc2 | Memory.Cartridge.Mbc2Batt -> Memory.Mbc.Mbc2
+                      | Memory.Cartridge.Mbc3 | Memory.Cartridge.Mbc3Ram | Memory.Cartridge.Mbc3RamBatt | Memory.Cartridge.Mbc3TimerBatt | Memory.Cartridge.Mbc3TimerRamBatt -> Memory.Mbc.Mbc3
+                      | _ -> Memory.Mbc.RomOnly
 
     let hasExternalRam = match cartridge with
                      | Memory.Cartridge.Mbc1Ram | Memory.Cartridge.Mbc1RamBatt | Memory.Cartridge.RomRam | Memory.Cartridge.RomRamBatt | Memory.Cartridge.Mbc3TimerRamBatt | Memory.Cartridge.Mbc3Ram | Memory.Cartridge.Mbc3RamBatt -> true
