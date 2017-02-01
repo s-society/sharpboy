@@ -24,7 +24,7 @@ let main argv =
     openRomDialog.Title <- "Select Game Boy ROM" 
     openRomDialog.Filter <- "Gameboy ROM Files|*.gb|All files|*.*"
     if openRomDialog.ShowDialog() = DialogResult.OK then
-        rom <- File.ReadAllBytes(openRomDialog.FileName)
+        Memory.rom <- File.ReadAllBytes(openRomDialog.FileName)
     else Environment.Exit(1)
 
     if rom.Length > int (snd ROM1+1us) then

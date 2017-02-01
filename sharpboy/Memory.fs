@@ -5,7 +5,8 @@ let memory = Array.create (0xFFFF+1) 0uy
 let mutable temp = 0uy
 let mutable temp16 = 0us
 let mutable swap = 0
-
+//Initializing rom to be able to define readAdress before loading the rom from dialog box
+let mutable rom = [|0uy|]
 
 // Keep track of different memory places
 let ROM0 = (0us, 0x3FFFus) // ROM 0 (16 KB)
@@ -14,6 +15,7 @@ let VRAM = (0x8000us,0x9FFFus) // Video RAM (8KB)
 let IRAM = (0xC000us,0xDFFFus) // Interal RAM (8KB)
 let ECHO = (0xE000us,0xFDFFus) // Echo of internal RAM
 let OAM = (0xFE00us, 0xFE9Fus) // Object attribute memory
+let SWRAMBANK = (0xA000us,0xBFFFus) // Switchable RAM
 
 let mutable P14, P15 = 0xEFuy,0xDFuy //Joypad out ports
 
