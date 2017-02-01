@@ -19,18 +19,30 @@ let main argv =
     memory.[int SCROLLY] <- 0x0uy  ; memory.[int LY] <-   0x0uy            ; memory.[int LYC] <-     0x0uy 
     memory.[int IE] <- 0x0uy  
 
-    let mutable rom = [|0uy|]
     let openRomDialog = new OpenFileDialog()
     openRomDialog.Title <- "Select Game Boy ROM" 
     openRomDialog.Filter <- "Gameboy ROM Files|*.gb|All files|*.*"
     if openRomDialog.ShowDialog() = DialogResult.OK then
-        rom <- File.ReadAllBytes(openRomDialog.FileName)
+        Memory.rom <- File.ReadAllBytes(openRomDialog.FileName)
     else Environment.Exit(1)
 
     if rom.Length > int (snd ROM1+1us) then
         rom.[0..int (snd ROM1)].CopyTo(memory,0)
     else
         rom.CopyTo(memory,0)
+
+    //Reading bytes to know MBC type and cartridge options
+    Memory.cartridge <- LanguagePrimitives.EnumOfValue<byte, Memory.Cartridge>(memory.[0x0147])
+    
+    Memory.mbcType <- match cartridge with
+                      | Memory.Cartridge.Mbc1 | Memory.Cartridge.Mbc1Ram | Memory.Cartridge.Mbc1RamBatt -> Memory.Mbc.Mbc1
+                      | Memory.Cartridge.Mbc2 | Memory.Cartridge.Mbc2Batt -> Memory.Mbc.Mbc2
+                      | Memory.Cartridge.Mbc3 | Memory.Cartridge.Mbc3Ram | Memory.Cartridge.Mbc3RamBatt | Memory.Cartridge.Mbc3TimerBatt | Memory.Cartridge.Mbc3TimerRamBatt -> Memory.Mbc.Mbc3
+                      | _ -> Memory.Mbc.RomOnly
+
+    let hasExternalRam = match cartridge with
+                     | Memory.Cartridge.Mbc1Ram | Memory.Cartridge.Mbc1RamBatt | Memory.Cartridge.RomRam | Memory.Cartridge.RomRamBatt | Memory.Cartridge.Mbc3TimerRamBatt | Memory.Cartridge.Mbc3Ram | Memory.Cartridge.Mbc3RamBatt -> true
+                     | _ -> false
 
     let form = new DoubleBufferForm()
 
@@ -77,9 +89,9 @@ let main argv =
         while true do
             if not stopped then
 
-                cycles <- opcode.[int (readAddress(PC))]() * 4uy
+                cycles <- opcode.[int (Memory.readAddress(PC))]() * 4uy
                 if cycles = 0uy then do
-                    ignore(MessageBox.Show(String.Format("Invalid Opcode {2}{0:X2} at 0x{1:X4}", readAddress(PC), (if unhandledCBOpcode then PC-1us else PC), if unhandledCBOpcode then "CB " else String.Empty))); 
+                    ignore(MessageBox.Show(String.Format("Invalid Opcode {2}{0:X2} at 0x{1:X4}", Memory.readAddress(PC), (if unhandledCBOpcode then PC-1us else PC), if unhandledCBOpcode then "CB " else String.Empty))); 
                     Environment.Exit(1)
             
                 lcdCycles <- lcdCycles + int cycles
@@ -109,9 +121,9 @@ let main argv =
                             let tileOffset = (uint16 ((x + int (memory.[int SCROLLX]))/8) + uint16 (32*((y+int (memory.[int SCROLLY]))/8))) % 0x400us
                             let tilePixelX = uint16 ((x+int (memory.[int SCROLLX]))%8)
                             let tilePixelY = uint16 ((y+int (memory.[int SCROLLY]))%8)
-                            let tileIndex = readAddress(BG_TILE_MAP_SEL + tileOffset)
+                            let tileIndex = Memory.readAddress(BG_TILE_MAP_SEL + tileOffset)
                             let address = TILE_PATTERN_TABLE_SEL + uint16 (if TILE_PATTERN_TABLE_SEL = TILE_PATTERN_TABLE_1 then (0x800s + ((int16 (sbyte tileIndex)) * 16s)) else (int16 tileIndex*16s)) + (tilePixelY*2us)
-                            screenBuffer.[(y*SCREEN_WIDTH) + x] <- (if readAddress(address) &&& (0b10000000uy >>> int tilePixelX) > 0uy then 1 else 0) ||| (if readAddress(address+1us) &&& (0b10000000uy >>> int tilePixelX) > 0uy then 0b10 else 0)
+                            screenBuffer.[(y*SCREEN_WIDTH) + x] <- (if Memory.readAddress(address) &&& (0b10000000uy >>> int tilePixelX) > 0uy then 1 else 0) ||| (if Memory.readAddress(address+1us) &&& (0b10000000uy >>> int tilePixelX) > 0uy then 0b10 else 0)
                     
                         for sprite in [(int (fst OAM))..4..(int (snd OAM))] do
                             let spx,spy,pattern,flipx,flipy = int memory.[sprite+1], int memory.[sprite], int memory.[sprite+2], int (if (memory.[sprite+3] &&& (1uy <<< 5)) > 0uy then 1uy else 0uy), int (if (memory.[sprite+3] &&& (1uy <<< 6)) > 0uy then 1uy else 0uy) 
@@ -119,7 +131,7 @@ let main argv =
                                 for tilePixelX in [0..7] do
                                     let ftilePixelX = if flipx = 1 then 7-tilePixelX else tilePixelX
                                     let address = TILE_PATTERN_TABLE_0 + uint16 ((pattern*16) + ((if flipy = 1 then (7-(y-(spy-16))) else y-(spy-16))*2))
-                                    let color = (if readAddress(address) &&& (0b10000000uy >>> ftilePixelX) > 0uy then 1 else 0) ||| (if readAddress(address+1us) &&& (0b10000000uy >>> ftilePixelX) > 0uy then 0b10 else 0)
+                                    let color = (if Memory.readAddress(address) &&& (0b10000000uy >>> ftilePixelX) > 0uy then 1 else 0) ||| (if Memory.readAddress(address+1us) &&& (0b10000000uy >>> ftilePixelX) > 0uy then 0b10 else 0)
                                     if color > 0 then screenBuffer.[(y*SCREEN_WIDTH) + spx - 8 + tilePixelX] <- color
                                      
                     incrementLY()
