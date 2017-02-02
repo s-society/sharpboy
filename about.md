@@ -28,6 +28,9 @@ You can find more about me on [my website](https://alarsyo.com).
 # Martin Meunier
 
 # Ilyes Noumri
+I'm interested in computer sciences since my childhood and my first ever game played was on an emulator so to take part on this project is a real pleasure. I owned and spent some good times on my GameBoy when I was a kid and always wanted to know how my GameBoy worked. This project not only give me a glimpse on how a GameBoy worked but give me the chance to understand more about other consoles and some basic understanding on how a processor work and behave with other components of a system.
+
+I'm also passionate about all kind of mobility technologies, virtualization technologies and networking.
 
 ## Tools
 
