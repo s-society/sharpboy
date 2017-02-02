@@ -9,7 +9,7 @@ emulator.
 
 We're now done with this project, which we worked on during our second semester.
 
-# Equipe
+# Team
 
 ## Gabriel Duque
 
@@ -19,4 +19,4 @@ We're now done with this project, which we worked on during our second semester.
 
 ## Ilyes Noumri
 
-# Outils
+# Tools
