@@ -29,15 +29,13 @@ This project is mainly a way for me to learn a lot about emulation and how the G
 
 # Tools
 
-- IDEs :
+- Visual Studio :
 
- - Visual Studio :
+ IDE used to edit, run and debug our emulator on Windows
 
-   Used to edit, run and debug our emulator on Windows
+- MonoDevelop :
 
- - MonoDevelop :
-
-   Used to edit, run and debug our emulator on Linux
+ IDE used to edit, run and debug our emulator on Linux
 
 - GitHub :
 
