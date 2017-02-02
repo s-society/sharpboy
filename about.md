@@ -13,6 +13,13 @@ We're now done with this project, which we worked on during our second semester.
 
 # Gabriel Duque
 
+I have been passionate about Computer Science since I was a child. I am a very big Linux fan and hence an Open Source supporter. 
+My favorite domain in IT is cyber-security and this project is mainly to acquire knowledge concerning Computer Science and more precisely about concerning how a CPU works.
+The is the project I had to for school during my 2nd semester at EPITA, a french engineering school.
+Thank you very much for checking out our project and I hope you had fun if you downloaded it !
+
+You can find more about me on [my website](http://gabrielduque.me).
+
 # Antoine Martin
 
 I've been interested in computers since my childhood. After a failed attempt to
