@@ -27,7 +27,7 @@ This project is mainly a way for me to learn a lot about emulation and how the G
 
 ## Ilyes Noumri
 
-# Tools
+### Tools
 
 - Visual Studio :
 
