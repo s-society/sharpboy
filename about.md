@@ -28,3 +28,21 @@ This project is mainly a way for me to learn a lot about emulation and how the G
 ## Ilyes Noumri
 
 # Tools
+
+- IDEs :
+
+ - Visual Studio :
+
+   Used to edit, run and debug our emulator on Windows
+
+ - MonoDevelop :
+
+   Used to edit, run and debug our emulator on Linux
+
+- GitHub :
+
+ Git platform used to host our version control repo as well as our website
+
+- Jekyll :
+
+ Ruby static site generator, used by GitHub Pages to generate project websites
