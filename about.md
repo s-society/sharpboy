@@ -7,4 +7,12 @@ permalink: /about/
 We are a team of students at [EPITA](http://epita.fr) trying to build a F# GameBoy
 emulator.
 
-We're currently in our second semester, and this emulator is our programming project for the whole semester.
+We're now done with this project, which we worked on during our second semester.
+
+# Gabriel Duque
+
+# Antoine Martin
+
+# Martin Meunier
+
+# Ilyes Noumri
