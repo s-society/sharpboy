@@ -23,6 +23,8 @@ I'm passionate about Linux, Open Source Software, and pretty much everything whi
 
 This project is mainly a way for me to learn a lot about emulation and how the GameBoy's relatively simple system architecture works.
 
+You can find more about me on [my website](https://alarsyo.com).
+
 # Martin Meunier
 
 # Ilyes Noumri
