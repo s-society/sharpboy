@@ -9,10 +9,14 @@ emulator.
 
 We're now done with this project, which we worked on during our second semester.
 
-# Gabriel Duque
+# Equipe
 
-# Antoine Martin
+## Gabriel Duque
 
-# Martin Meunier
+## Antoine Martin
 
-# Ilyes Noumri
+## Martin Meunier
+
+## Ilyes Noumri
+
+# Outils
