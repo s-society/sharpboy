@@ -9,11 +9,11 @@ emulator.
 
 We're now done with this project, which we worked on during our second semester.
 
-# Team
+## Team
 
-## Gabriel Duque
+# Gabriel Duque
 
-## Antoine Martin
+# Antoine Martin
 
 I've been interested in computers since my childhood. After a failed attempt to
 get into medical school I switched my focus to computer science which has always
@@ -23,11 +23,11 @@ I'm passionate about Linux, Open Source Software, and pretty much everything whi
 
 This project is mainly a way for me to learn a lot about emulation and how the GameBoy's relatively simple system architecture works.
 
-## Martin Meunier
+# Martin Meunier
 
-## Ilyes Noumri
+# Ilyes Noumri
 
-### Tools
+## Tools
 
 - Visual Studio :
 
