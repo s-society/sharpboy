@@ -121,7 +121,7 @@ let  writeAddress (address:uint16, data:byte) =
                                                                                                                     mbc1RamMode <- false                                                                                                                                                                        //romBankOffset <- uint16 (data) * 0x4000us     
                                                 //6000 - 7FFF ROM(0) or RAM(1) Mode (MBC1), 
                                                 | address when address >= 0x6000us && address <= 0x7FFFus -> if mbcType = Mbc.Mbc1 then 
-                                                                                                                mbc1RamMode <- if (data &&& 1uy) = 1uy then true else false
+                                                                                                                mbc1RamMode <- (data &&& 1uy) = 1uy
                                                                                                              else () 
                
     //Writing to SWRAMBANK
